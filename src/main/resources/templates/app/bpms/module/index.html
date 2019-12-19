@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="shared/sharedcss"></div>
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <script th:src="@{/js/app/bpms/module/index.js}"></script>
+</head>
+<body class="gray-bg">
+<div class="panel-body" style="padding-bottom:0px;">
+    <input type="hidden" id="hidModuleId" name="hidModuleId" value=""/>
+    <input type="hidden" id="hidParentId" name="hidParentId" value="" />
+    <input type="hidden" id="hidStatus" name="hidStatus" value="" />
+    <div class="row">
+        <div class="col-sm-3">
+            <a onclick="backRoot()">根模块</a>
+            <div id="moduleTree"></div>
+        </div>
+        <div class="col-sm-8">
+            <div id="toolbar">
+                <shiro:hasPermission name="module:edit">
+                    <button id="btn_add" type="button" class="btn btn-info">添加</button>
+                </shiro:hasPermission>
+                <shiro:hasPermission name="module:edit">
+                     <button id="btn_edit" type="button" class="btn  btn-info">编辑</button>
+                </shiro:hasPermission>
+                <shiro:hasPermission name="module:edit">
+                    <button id="btn_delete" type="button" class="btn  btn-info">删除</button>
+                 </shiro:hasPermission>
+            </div>
+            <table id="tab"></table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

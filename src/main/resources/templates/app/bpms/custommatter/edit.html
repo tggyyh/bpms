@@ -1,0 +1,408 @@
+<link th:href="@{/css/summernote/summernote.css}" rel="stylesheet" />
+<link th:href="@{/css/summernote/summernote-bs3.css}" rel="stylesheet" />
+<script th:src="@{/js/lib/summernote.min.js}"></script>
+<script th:src="@{/js/lib/summernote-zh-CN.js}"></script>
+
+<script th:src="@{/js/app/bpms/custommatter/edit.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="custombondmatterForm" class="form-horizontal m-t" enctype="multipart/form-data">
+                        <input type="hidden" id="tmpId" name="id" th:value="${customMatter.id}"/>
+                        <input type="hidden" id="status" name="status" th:value="${customMatter.status}"/>
+                        <input type="hidden" id="key" name="key" th:value="${customMatter.key}"/>
+                        <input type="hidden" id="relation" name="relation" th:value="${customMatter.relation}"/>
+                        <div class="form-group tmp-col hide">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>事项分类：
+                            </label>
+                            <div class="col-sm-10">
+                                <select id="type" name="type" class="form-control" aria-required="true" aria-invalid="true">
+                                    <option value="0" th:selected="${customMatter.type}==0?'selected'">发行人事项</option>
+                                    <option value="1" th:selected="${customMatter.type}==1?'selected'">项目事项</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="divMatterType" th:class="${customMatter.type}==0?'form-group tmp-col hide':'form-group tmp-colr'">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>事项类型：
+                            </label>
+                            <div class="col-sm-10">
+                                <select id="rightLine" name="rightLine" class="form-control" aria-required="true" aria-invalid="true"  disabled="disabled">
+                                    <option value="0" th:selected="${customMatter.rightLine}==0?'selected'">非行权付息事项</option>
+                                    <option value="1" th:selected="${customMatter.rightLine}==1?'selected'">行权付息事项</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>事项名称：
+                            </label>
+                            <div class="col-sm-10">
+                                <input id="name" name="name" type="text" class="form-control" th:value="${customMatter.name}"/>
+                            </div>
+                        </div>
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">事项说明：</label>
+                            <div class="col-sm-10">
+                                <textarea id="description" name="description" class="form-control" required="" aria-required="true" th:text="${customMatter.description}"/>
+                            </div>
+                        </div>
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">事项简称：</label>
+                            <div class="col-sm-4">
+                                <input id="shortname" name="shortname" type="text" class="form-control" th:value="${customMatter.shortname}"/>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="col-sm-4 control-label">事项图标：</label>
+                                <div id="showColor" class="col-sm-4 tmp-showcolor"></div>
+                                <div id="divColorpicker" class="col-sm-4 input-group">
+                                    <input id="color" name="color" type="text" th:value="${customMatter.color}" class="form-control" readonly="readonly" style="background-color: #FFFFFF;" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>提醒规则：
+                                <input type="hidden" id="templateruleType" name="templaterule.type" th:value="${customMatter.customRuleList[0].type}"/>
+                            </label>
+                            <div id="divRadioF" th:class="${customMatter.rightLine}==0?'col-sm-2':'col-sm-2 hide'">
+                                <input type="radio" value="0" id="radioF" name="radioTime" th:checked="${customMatter.customRuleList[0].type}==0?'checked'" />按固定时间触发
+                            </div>
+
+                            <div id="divRadioT" th:class="${customMatter.type}==0?'col-sm-2 hide':'col-sm-2'">
+                                <input type="radio" value="1" id="radioT" name="radioTime" th:checked="${customMatter.customRuleList[0].type}==1?'checked'" />按T-N触发
+                            </div>
+                        </div>
+
+                        <div id="divF" th:class="${customMatter.customRuleList[0].type}==0?'form-group tmp-col':'form-group tmp-col hide'" style="padding-bottom: 20px;">
+                            <label class="col-sm-2 control-label"></label>
+                            <div id="divFTime" class="col-sm-10">
+                                <div name="rule-0" th:if="${customMatter.customRuleList.size()}&lt;1" class="divTime">
+                                    <div class="col-sm-5">
+                                        <label class="col-sm-5 label-top-5">提醒时间:</label>
+                                        <div class="input-group date form_datetime col-sm-7">
+                                            <input type="text" class="form-control" name="remindDate1" style="position:absolute;z-index:999999999;background-color: #FFFFFF;" onclick="changeDate1(this)" readonly="readonly" autocomplete="off"/>
+                                            <input name="remindDate" class="form-control c-disable" data-date-format="yyyy-MM-dd" type="text" style="position:absolute;z-index:99999999;background-color: #FFFFFF;" onchange="changeDate(this)" readonly="readonly" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label class="col-sm-5 label-top-5">需完成时间:</label>
+                                        <div class="input-group date form_datetime col-sm-7">
+                                            <input type="text" class="form-control" name="completeDate1" style="position:absolute;z-index:999999999;background-color: #FFFFFF;" onclick="changeDate1(this)" readonly="readonly" autocomplete="off"/>
+                                            <input name="completeDate" class="form-control c-disable" data-date-format="yyyy-MM-dd" type="text" style="position:absolute;z-index:99999999;background-color: #FFFFFF;" onchange="changeDate(this)" readonly="readonly" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div name="minus" title="remove" class="col-sm-1 glyphicon glyphicon-minus-sign tmp-time-minus" onclick="removeTime(this)">
+                                    </div>
+
+                                </div>
+                                <div th:name="${customRule.type}==0?'rule-'+${customRule.id}:'rule-0'" th:if="${customMatter.customRuleList.size()}&gt;0" class="divTime" th:each="customRule,customRuleStat:${customMatter.customRuleList}">
+                                    <div class="col-sm-5">
+                                        <label class="col-sm-5 label-top-5">提醒时间:</label>
+                                        <div class="input-group date form_datetime col-sm-7">
+                                            <input type="text" class="form-control" name="remindDate1" style="position:absolute;z-index:999999999;background-color: #FFFFFF;" th:value="${customRule.remindDate}==null?'':${#dates.format(customRule.remindDate, 'MM月dd日')}" onclick="changeDate1(this)" readonly="readonly" autocomplete="off"/>
+                                            <input name="remindDate" class="form-control c-disable" data-date-format="yyyy-MM-dd" type="text" th:value="${customRule.remindDate}==null?'':${#dates.format(customRule.remindDate, 'yyyy-MM-dd')}" style="position:absolute;z-index:99999999;background-color: #FFFFFF;" onchange="changeDate(this)" readonly="readonly" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label class="col-sm-5 label-top-5">需完成时间:</label>
+                                        <div class="input-group date form_datetime col-sm-7">
+                                            <input type="text" class="form-control" name="completeDate1" style="position:absolute;z-index:999999999;background-color: #FFFFFF;" th:value="${customRule.completeDate}==null?'':${#dates.format(customRule.completeDate, 'MM月dd日')}" onclick="changeDate1(this)" readonly="readonly" autocomplete="off"/>
+                                            <input name="completeDate" class="form-control c-disable" data-date-format="yyyy-MM-dd" type="text" th:value="${customRule.completeDate}==null?'':${#dates.format(customRule.completeDate, 'yyyy-MM-dd')}" style="position:absolute;z-index:99999999;background-color: #FFFFFF;" onchange="changeDate(this)" readonly="readonly" autocomplete="off" />
+                                        </div>
+                                    </div>
+                                    <div name="minus" title="remove" class="col-sm-1 glyphicon glyphicon-minus-sign tmp-time-minus" onclick="removeTime(this)">
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10 glyphicon glyphicon-exclamation-sign tmp-padding-5 exclamation-msg">
+                                “提醒时间”为触发该事项的时间，“需完成时间”为该事项最晚需完成的时间。按“年”为触发周期
+                            </div>
+
+
+                            <label class="col-sm-2 control-label"></label>
+                            <div id="divAddTime" class="col-sm-2 glyphicon glyphicon-plus-sign tmp-time-plus">
+                                <span>添加时间</span>
+                            </div>
+                        </div>
+
+                        <div id="divT" th:name="${customMatter.customRuleList[0].type}==1?'rule-'+${customMatter.customRuleList[0].id}:'rule-0'" th:class="${customMatter.customRuleList[0].type}==1?'form-group tmp-col':'form-group tmp-col hide'" style="padding-bottom: 20px;">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
+                                <label class="col-sm-3 text-center label-top-5">提醒时间：付息日提前</label>
+                                <div class="col-sm-2">
+                                    <input id="beforeDay" name="beforeDay" type="text" class="form-control val-num" th:value="${customMatter.rightLine}==0?${customMatter.customRuleList[0].beforeDay}:${customMatter.customSubMatterList[0].beforeDay}" />
+                                </div>
+                                <label id="lblRemindBeforeDate" class="col-sm-5 label-top-5" th:text="${customMatter.rightLine}==0?(${customMatter.customRuleList[0].remindDate}==null?'工作日':('工作日（'+${#dates.format(customMatter.customRuleList[0].remindDate, 'yyyy-MM-dd')}+')')):(${customMatter.customSubMatterList[0].beforeDate}==null?'工作日':('工作日（'+${#dates.format(customMatter.customSubMatterList[0].beforeDate, 'yyyy-MM-dd')}+')'))">工作日</label>
+                            </div>
+                            <label th:class="${customMatter.rightLine}==0?'col-sm-2 control-label base_completeBefore':'col-sm-2 control-label base_completeBefore hide'"></label>
+                            <div th:class="${customMatter.rightLine}==0?'col-sm-10 base_completeBefore':'col-sm-10 base_completeBefore hide'">
+                                <label class="col-sm-3 text-center label-top-5">需完成时间：付息日提前</label>
+                                <div class="col-sm-2">
+                                    <input id="completeBeforeDay" name="completeBeforeDay" type="text" class="col-sm-2 form-control val-num" th:value="${customMatter.customRuleList[0].completeBeforeDay}"/>
+                                </div>
+                                <label id="lblCompleteBeforeDate" class="col-sm-5 label-top-5" th:text="${customMatter.customRuleList[0].completeDate}==null?'工作日':('工作日（'+${#dates.format(customMatter.customRuleList[0].completeDate, 'yyyy-MM-dd')}+')')">工作日</label>
+                            </div>
+                            <label class="col-sm-2 control-label"></label>
+                            <div id="divMsgRule" class="col-sm-10 glyphicon glyphicon-exclamation-sign tmp-padding-5 exclamation-msg" th:text="${customMatter.rightLine}==0?'“提醒时间”为触发该事项的时间，“需完成时间”为该事项最晚需完成的时间。按“年”为触发周期':'“提醒时间”为触发该事项的时间，根据付息频率，按“年”为触发周期'">
+                                “提醒时间”为触发该事项的时间，“需完成时间”为该事项最晚需完成的时间。按“年”为触发周期
+                            </div>
+                        </div>
+
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>督导确认：
+                            </label>
+                            <div class="col-sm-10">
+                                <div class="col-sm-2">
+                                    <input type="radio" value="0" name="radioConfirm" th:checked="${customMatter.confirm}==0?'checked'" />不需要
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="radio" value="1" name="radioConfirm" th:checked="${customMatter.confirm}==1?'checked'" />需要
+                                </div>
+                                <div class="col-sm-8 glyphicon glyphicon-exclamation-sign exclamation-msg">设置事项触发后，是否需要督导确认</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group tmp-col">
+                            <input type="hidden" id="hidMailUser" th:value="${customMatter.mailUser}" />
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>触发通知：
+                            </label>
+                            <div class="col-sm-10">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="1" id="mailUser1" name="cbxMailUser" />发行人对接人
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="2" id="mailUser2" name="cbxMailUser" />项目负责人
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" value="4" id="mailUser4" name="cbxMailUser" />督导人员
+                                </label>
+                                <label class="checkbox-inline">
+                                    <div class="glyphicon glyphicon-exclamation-sign exclamation-msg">设置事项触发后，邮件通知对象</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div th:class="${customMatter.rightLine}==0?'form-group tmp-col unSubMatter':'form-group tmp-col unSubMatter hide'">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>提醒频率：
+                            </label>
+                            <div class="col-sm-10">
+                                <div style="float:left;padding-top:5px;padding-right:5px;">需完成时间提前</div>
+                                <div style="float:left;">
+                                    <input id="mailBeforeDay" name="mailBeforeDay" type="text" th:value="${customMatter.mailBeforeDay}" class="form-control val-num" placeholder="工作日" style="width:80px;" />
+                                </div>
+                                <div id="divMailBeforeDay" style="float:left;padding:5px 5px 0 5px;" th:text="${customMatter.mailBeforeDate}==null?'工作日开始，每隔':('('+${#dates.format(customMatter.mailBeforeDate, 'yyyy-MM-dd')}+')工作日开始，每隔')">工作日开始，每隔</div>
+                                <div style="float:left;">
+                                    <input id="mailFrequency" name="mailFrequency" type="text" th:value="${customMatter.mailFrequency}" class="form-control val-num" placeholder="工作日" style="width:80px;" />
+                                </div>
+                                <div style="float:left;padding-top:5px;padding-left:5px;">工作日,项目负责人仍未提交处理,将再次邮件提醒项目负责人</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">
+                                模板材料：
+                            </label>
+                            <div class="col-sm-10">
+                                <div class="col-sm-12 tmp-bgcolor-y">
+                                    <span class="fa fa-paperclip tmp-font-20 tmp-padding-5"></span>
+                                    <span class="tmp-padding-5">共<span id="spanFileNum" th:text="${customMatter.customAttachmentList.size()}"></span>个文件</span>
+                                    <span id="fileDownloadAll" class="tmp-link tmp-padding-5">全部下载</span>
+                                    <span id="fileRemoveAll" class="tmp-link tmp-font-red tmp-padding-5">全部删除</span>
+                                </div>
+
+                                <div id="tmpFiles" class="col-sm-12">
+                                    <div class="tmp-file" style="width:100%;text-align:left;" th:each="customAttachment,customAttachmentStat:${customMatter.customAttachmentList}">
+                                        <input type="hidden" name="customAttachment.type" th:value="${customAttachment.type}" />
+                                        <input type="hidden" name="customAttachment.name" th:value="${customAttachment.name}" />
+                                        <input type="hidden" name="customAttachment.url" th:value="${customAttachment.url}"/>
+
+                                        <!--<div th:class="'tmp-file-' + ${customAttachment.type}" th:title="${customAttachment.name}">-->
+                                        <!--</div>-->
+                                        <!--<div class="tmp-file-content tmp-font-12" th:title="${customAttachment.name}" th:text="${customAttachment.name}">-->
+                                        <!--</div>-->
+                                        <!--<div class="tmp-file-down" onclick="downFile(this)">下载</div>-->
+                                        <!--<div class="tmp-file-remove" onclick="fileRemove(this)">删除</div>-->
+
+                                        <div th:title="${customAttachment.name}" th:text="${customAttachment.name}" style="float:left;max-width:85%;padding:5px 0;display:block;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">
+
+                                        </div>
+                                        <div class="tmp-file-down" style="padding:5px;" onclick="downFile(this)">下载</div>
+                                        <div class="tmp-file-remove" style="padding:5px;" onclick="fileRemove(this)">删除</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <input id="uploadTmpFile" name="file" class="file hide" type="file" multiple="multiple"  onchange="setTmpFile(this)" />
+                                    <div id="addTmpFile" class="glyphicon glyphicon-plus-sign tmp-time-plus" data-original-title="AddFile">
+                                        <span>添加所需材料</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <br/><br/>
+                        <div id="divMatterContent" class="form-group tmp-col">
+                            <label class="col-sm-2 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>事项内容：
+                                <input type="hidden" id="hidSummernote-0" th:value="${customMatter.content}" />
+                            </label>
+
+                            <div class="col-sm-10">
+                                <div id="summernote-0" class="summernote"></div>
+                            </div>
+                        </div>
+
+                        <div id="divSubMatter" th:class="${customMatter.rightLine}==1?'form-group tmp-col subMatter':'form-group tmp-col subMatter hide'">
+                            <div id="divSub">
+                                <div th:if="null==${customMatter.customSubMatterList} or ${customMatter.customSubMatterList.size()}==0" name="divSubMatter-1" class="sub-matter">
+                                    <div class="form-group tmp-col">
+                                        <label name="lblSubName" class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>
+                                            <span id="spanOrderIndex-1" name="spanOrderIndex">子事项1：</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input id="subName-1" name="subName" type="text" class="form-control" placeholder=""/>
+                                        </div>
+                                        <div id="divSubMatterColose-1" name="divSubMatterColose" class="col-sm-1 glyphicon glyphicon-remove text-right sub-matter-close" onclick="removeSubMatter(this)">
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>
+                                            <span>需完成时间：</span>
+                                        </label>
+                                        <div class="col-sm-5">
+                                            <label class="col-sm-3 text-center label-top-5">付息日提前</label>
+                                            <div class="col-sm-4">
+                                                <input id="subCompleteBeforeDay-1" name="subCompleteBeforeDay" type="text" class="col-sm-2 form-control val-num" onblur="setCustomCompleteDate(this)" />
+                                            </div>
+                                            <label id="subCompleteBeforeDate-1" name="subCompleteBeforeDate" class="col-sm-5 label-top-5">工作日</label>
+                                        </div>
+                                        <div class="col-sm-5 glyphicon glyphicon-exclamation-sign tmp-padding-5 exclamation-msg">
+                                            “需完成时间”为该事项最晚需完成的时间
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>提醒频率：
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <div style="float:left;padding-top:5px;padding-right:5px;">需完成时间提前</div>
+                                            <div style="float:left;">
+                                                <input id="mailBeforeDay-1" name="mailBeforeDay" type="text" class="form-control val-num" placeholder="工作日" style="width:80px;" onblur="setCustomMailCompleteDate(this)" />
+                                            </div>
+                                            <div id="divMailBeforeDay-1" name="divMailBeforeDay" style="float:left;padding:5px 5px 0 5px;">工作日开始，每隔</div>
+                                            <div style="float:left;">
+                                                <input id="mailFrequency-1" name="mailFrequency" type="text" class="form-control val-num" placeholder="工作日" style="width:80px;" />
+                                            </div>
+                                            <div style="float:left;padding-top:5px;padding-left:5px;">工作日,项目负责人仍未提交处理,将再次邮件提醒项目负责人</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>事项内容：
+                                        </label>
+
+                                        <div class="col-sm-10">
+                                            <div id="summernote-1" class="summernote"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12" style="background:#FFFFFF;height:10px;"></div>
+                                </div>
+                                <div th:if="nulll!=${customMatter.customSubMatterList} and ${customMatter.customSubMatterList.size()}&gt;0" th:each="subMatter,subMatterStat:${customMatter.customSubMatterList}" th:name="'divSubMatter-'+${subMatter.orderIndex}" class="sub-matter">
+                                    <div class="form-group tmp-col">
+                                        <label name="lblSubName" class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>
+                                            <span th:id="'spanOrderIndex-'+${subMatter.orderIndex}" name="spanOrderIndex" th:text="'子事项'+${subMatter.orderIndex}+'：'"></span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            <input th:id="'subName-'+${subMatter.orderIndex}" name="subName" type="text" th:value="${subMatter.name}" class="form-control" placeholder=""/>
+                                        </div>
+                                        <div th:id="'divSubMatterColose-'+${subMatter.orderIndex}" name="divSubMatterColose" class="col-sm-1 glyphicon glyphicon-remove text-right sub-matter-close" onclick="removeSubMatter(this)">
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>
+                                            <span>需完成时间：</span>
+                                        </label>
+                                        <div class="col-sm-5">
+                                            <label class="col-sm-3 text-center label-top-5">付息日提前</label>
+                                            <div class="col-sm-4">
+                                                <input th:id="'subCompleteBeforeDay-'+${subMatter.orderIndex}" name="subCompleteBeforeDay" th:value="${subMatter.completeBeforeDay}" type="text" class="col-sm-2 form-control val-num" onblur="setCustomCompleteDate(this)" />
+                                            </div>
+                                            <label th:id="'subCompleteBeforeDate-'+${subMatter.orderIndex}" name="subCompleteBeforeDate" class="col-sm-5 label-top-5" th:text="${subMatter.completeBeforeDate}==null?'工作日':('工作日（'+${#dates.format(subMatter.completeBeforeDate, 'yyyy-MM-dd')}+')')">工作日</label>
+                                        </div>
+                                        <div class="col-sm-5 glyphicon glyphicon-exclamation-sign tmp-padding-5 exclamation-msg">
+                                            “需完成时间”为该事项最晚需完成的时间
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>提醒频率：
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <div style="float:left;padding-top:5px;padding-right:5px;">需完成时间提前</div>
+                                            <div style="float:left;">
+                                                <input th:id="'mailBeforeDay-'+${subMatter.orderIndex}" name="mailBeforeDay" type="text" th:value="${subMatter.mailBeforeDay}" class="form-control val-num" placeholder="工作日" style="width:80px;" onblur="setCustomMailCompleteDate(this)" />
+                                            </div>
+                                            <div th:id="'divMailBeforeDay-'+${subMatter.orderIndex}" name="divMailBeforeDay" th:text="${subMatter.mailBeforeDate}==null?'工作日开始，每隔':('（'+${#dates.format(subMatter.mailBeforeDate, 'yyyy-MM-dd')}+')工作日开始，每隔')" style="float:left;padding:5px 5px 0 5px;">工作日开始，每隔</div>
+                                            <div style="float:left;">
+                                                <input th:id="'mailFrequency-'+${subMatter.orderIndex}" name="mailFrequency" type="text" th:value="${subMatter.mailFrequency}" class="form-control val-num" placeholder="工作日" style="width:80px;" />
+                                            </div>
+                                            <div style="float:left;padding-top:5px;padding-left:5px;">工作日,项目负责人仍未提交处理,将再次邮件提醒项目负责人</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group tmp-col">
+                                        <label class="col-sm-2 control-label">
+                                            <div class="glyphicon glyphicon-asterisk form-required"></div>事项内容：
+                                            <input type="hidden" th:id="'hidSummernote-'+${subMatter.orderIndex}" th:value="${subMatter.content}" />
+                                        </label>
+
+                                        <div class="col-sm-10">
+                                            <div th:id="'summernote-'+${subMatter.orderIndex}" class="summernote"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12" style="background:#FFFFFF;height:10px;"></div>
+                                </div>
+                            </div>
+
+                            <br/>
+                            <div class="form-group tmp-col">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-10">
+                                    <button class="btn btn-blue" type="button" id="btnSubMatterAdd">
+                                        <i class="fa fa-plus"></i>&nbsp;&nbsp;
+                                        <span class="bold">添加子事项</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br/><br/>
+
+                        <div class="form-group tmp-col">
+                            <div class="col-sm-10 col-sm-offset-7 div-top-20">
+                                <button id="editCustombondmatterSave" name="editSave" class="btn btn-primary" type="button">提交
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="hidControl" name="hidControl" value="00" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

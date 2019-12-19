@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.SurviveProcessMapper1">
+
+    <select id="findSameRemind1" resultType="Integer">
+        select count(0) from bpms_survive_process a
+        INNER JOIN bpms_process_info b on a.process_id=b.process_id
+        where a.type=#{type}
+        and a.template_id=#{templateId}
+        and a.custom_id=#{customId}
+        and a.rule_id=#{ruleId}
+        and b.company_name=#{companyName}
+        <if test="bondCode !=null and bondCode !='' ">
+            and b.bond_code=#{bondCode}
+        </if>
+        and a.status!=4
+        and DATE_FORMAT(a.create_time,'%Y-%m-%d')= DATE_FORMAT(NOW(),'%Y-%m-%d')
+    </select>
+</mapper>

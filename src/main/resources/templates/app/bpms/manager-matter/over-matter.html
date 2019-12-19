@@ -1,0 +1,157 @@
+<form id="formSearch" class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label col-sm-1 label-top-5 text-right">关键字：</label>
+        <div class="col-sm-2">
+            <input type="text" id="search_common" class="form-control" placeholder="债券代码、简称、发行人" />
+        </div>
+
+        <label class="control-label col-sm-1 label-top-5 text-right">事项类型：</label>
+        <div class="col-sm-2">
+            <select id="search_matter_type" class="form-control" tabindex="2" data-style="btn-white">
+                <option value="">全部</option>
+                <option value="0">发行人事项</option>
+                <option value="1">项目事项</option>
+            </select>
+        </div>
+        <label class="control-label col-sm-1 label-top-5 text-right">需完成时间：</label>
+        <div class="col-sm-2">
+            <input id="search_completeDate" name="completeDate" class="form_date form-control" type="text"/>
+        </div>
+        <label class="control-label col-sm-1 label-top-5 text-right">上市场所：</label>
+        <div class="col-sm-2">
+            <select id="drop_search_listedPlace" class="form-control" tabindex="2" data-style="btn-white">
+                <option value="">全部</option>
+                <option value="MP01-上海证券交易所">MP01-上海证券交易所</option>
+                <option value="MP02-深圳证券交易所">MP02-深圳证券交易所</option>
+                <option value="MP03-银行间市场">MP03-银行间市场</option>
+                <option value="MP04-全国中小企业股份转让系统">MP04-全国中小企业股份转让系统</option>
+                <option value="MP05-机构间私募产品报价与服务系统">MP05-机构间私募产品报价与服务系统</option>
+                <option value="MP06-证券公司柜台转让">MP06-证券公司柜台转让</option>
+                <option value="MP99-其他">MP99-其他</option>
+                <option value="9999-信息缺失">9999-信息缺失</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-1 label-top-5 text-right">债券类型：</label>
+        <div class="col-sm-2">
+            <select id="drop_search_type" class="form-control" tabindex="2" data-style="btn-white">
+                <option value="">全部</option>
+                <option value="FB07-政策性金融债">FB07-政策性金融债</option>
+                <option value="CB030-公募公司债">CB030-公募公司债</option>
+                <option value="CB031-私募公司债">CB031-私募公司债</option>
+                <option value="CB05-分离交易的可转换公司债">CB05-分离交易的可转换公司债</option>
+                <option value="CB04-普通可转换公司债">CB04-普通可转换公司债</option>
+                <option value="ABS02-企业资产支持证券">ABS02-企业资产支持证券</option>
+                <option value="ABS01-信贷资产支持证券">ABS01-信贷资产支持证券</option>
+                <option value="企业债">企业债</option>
+            </select>
+        </div>
+
+        <label class="control-label col-sm-1 label-top-5 text-right">省：</label>
+        <div class="col-sm-2">
+            <select id="drop_search_province" name="type" class="form-control" tabindex="2">
+            </select>
+        </div>
+
+        <label class="control-label col-sm-1 label-top-5 text-right">市：</label>
+        <div class="col-sm-2">
+            <select id="drop_search_city" name="type" class="form-control" tabindex="2">
+            </select>
+        </div>
+        <label class="col-sm-1 control-label label-top-5 text-right">项目人员：</label>
+        <div class="col-sm-2">
+            <select id="drop_search_user" tabindex="2" class="form-control" data-style="btn-white">
+                <option value="">全部</option>
+                <option th:each="user,userStat:${userList}" th:value="${user.id}" th:text="${user.name}"></option>
+            </select>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label label-top-5 text-right">付息日：</label>
+        <div class="col-sm-4">
+            <div class="col-sm-5">
+                <input id="txt_search_valueDate_begin" class="form-control form_date" type="text" />
+            </div>
+            <div class="col-sm-1 text-center">
+                -
+            </div>
+            <div class="col-sm-5">
+                <input id="txt_search_valueDate_end" class="form-control form_date" type="text" />
+            </div>
+        </div>
+
+        <label class="col-sm-1 control-label label-top-5 text-right">兑付：</label>
+        <div class="col-sm-3">
+            <div class="col-sm-5">
+                <input id="txt_search_payDay_begin" class="form-control form_date_time" type="text" />
+            </div>
+            <div class="col-sm-1 text-center">
+                -
+            </div>
+            <div class="col-sm-5">
+                <input id="txt_search_payDay_end" class="form-control form_date_time" type="text" />
+            </div>
+        </div>
+
+        <label class="control-label col-sm-1 label-top-5 text-right">期限：</label>
+        <div class="col-sm-2">
+            <div class="col-sm-5">
+                <input id="txt_search_timeLimit_begin" class="form-control" type="text" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>
+            </div>
+            <div class="col-sm-1 text-center">
+                -
+            </div>
+            <div class="col-sm-5">
+                <input id="txt_search_timeLimit_end" class="form-control" type="text" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-1 label-top-5 text-right">担保：</label>
+        <div class="col-sm-2">
+            <input id="txt_search_guaranteeCompany" type="text" class="form-control"/>
+        </div>
+        <label class="control-label col-sm-1 label-top-5 text-right">受托管理：</label>
+        <div class="col-sm-1">
+            <select id="drop_search_bondManagerType" class="form-control" tabindex="2" data-style="btn-white">
+                <option value="">全部</option>
+                <option value="1">天风</option>
+                <option value="2">非天风</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <input id="txt_search_bondManager" type="text" class="form-control"/>
+        </div>
+        <label class="control-label col-sm-1 label-top-5 text-right">事项：</label>
+        <div class="col-sm-2">
+            <input id="txt_search_matterName" type="text" class="form-control"/>
+        </div>
+        <div class="col-sm-2 text-right">
+            <button type="button" id="search" class="btn btn-w-m btn-primary">查询</button>
+        </div>
+    </div>
+</form>
+<div>
+    <div id="tab_title" class="tab-title-color">
+        <label class="custom_table_title_1">事项名称</label>
+        <label class="custom_table_title_2">需要的事项材料</label>
+        <label class="custom_table_title_3">完成时间/需完成时间</label>
+        <label class="custom_table_title_4">事项状态</label>
+        <label class="custom_table_title_5">操作</label>
+    </div>
+    <p></p>
+    <div id="table" class="custom_table_size_1">
+
+    </div>
+</div>
+
+<div class="fixed-table-pagination" style="display: block;">
+
+</div>
+
+<script th:src="@{/js/common/pagination.js}"></script>
+<script th:src="@{/js/app/bpms/manager-matter/over-matter.js}"></script>
+<script th:src="@{/js/common/process.js}"></script>

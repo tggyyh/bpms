@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.MatterTemplateMapper">
+    <resultMap id="matterTemplateResultMap" type="MatterTemplate">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="rightLine" column="right_line"/>
+        <result property="name" column="name"/>
+        <result property="shortname" column="shortname"/>
+        <result property="description" column="description"/>
+        <result property="color" column="color" />
+        <result property="confirm" column="confirm" />
+        <result property="mailUser" column="mail_user" />
+        <result property="mailBeforeDay" column="mail_before_day"/>
+        <result property="mailFrequency" column="mail_frequency" />
+        <result property="status" column="status" />
+        <result property="userId" column="user_id" />
+        <result property="userName" column="userName" />
+        <result property="content" column="content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="autoRelate" column="auto_relate"/>
+
+        <collection property="templateRuleList" ofType="TemplateRule">
+            <id property="id" column="rule_id"/>
+            <result property="templateId" column="rule_template_id"/>
+            <result property="type" column="rule_type"/>
+            <result property="remindDate" column="rule_remind_date"/>
+            <result property="completeDate" column="rule_complete_date"/>
+            <result property="beforeDay" column="rule_before_day"/>
+            <result property="completeBeforeDay" column="rule_complete_before_day"/>
+            <result property="createTime" column="rule_create_time"/>
+        </collection>
+        <collection property="templateAttachmentList" ofType="TemplateAttachment">
+            <id property="id" column="attachment_id"/>
+            <result property="templateId" column="attachment_template_id"/>
+            <result property="type" column="attachment_type"/>
+            <result property="name" column="attachment_name"/>
+            <result property="url" column="attachment_url"/>
+            <result property="description" column="attachment_description"/>
+            <result property="createTime" column="attachment_create_time"/>
+        </collection>
+    </resultMap>
+
+    <select id="findMatterAll" resultType="MatterTemplate">
+        SELECT * FROM bpms_matter_template
+        WHERE `status`=0
+        ORDER BY type,create_time DESC
+    </select>
+
+    <select id="isExist" resultType="int" parameterType="MatterTemplate">
+        SELECT COUNT(id) tempCount FROM bpms_matter_template WHERE id!=#{id} AND `status`=0 AND `name`=#{name}
+    </select>
+
+    <select id="findAll" resultType="MatterTemplate">
+        SELECT t1.*,sysUser.name userName, t2.linkCompCount,t3.linkBondCount
+        FROM bpms_matter_template t1
+        LEFT JOIN sys_user sysUser ON t1.user_id=sysUser.id
+        LEFT JOIN (
+          SELECT template_id,COUNT(template_id) linkCompCount FROM bpms_company_matter WHERE `status`=0 GROUP BY template_id
+        ) t2 ON t1.id=t2.template_id
+        LEFT JOIN (
+          SELECT template_id,COUNT(template_id) linkBondCount FROM bpms_bond_matter WHERE `status`=0 GROUP BY template_id
+        ) t3 ON t1.id=t3.template_id
+        WHERE t1.`status`=0
+        ORDER BY type,create_time DESC
+    </select>
+
+    <select id="findByType" resultType="MatterTemplate">
+        SELECT * FROM bpms_matter_template WHERE `status`=0 AND type=#{type} ORDER BY type,create_time DESC
+    </select>
+
+    <select id="findById" resultType="MatterTemplate">
+        SELECT * FROM bpms_matter_template WHERE id=#{id}
+    </select>
+
+    <!--Insert-->
+    <insert id="insertMatterTemplate" useGeneratedKeys="true" keyProperty="id" parameterType="MatterTemplate">
+        INSERT INTO bpms_matter_template (`type`, `name`, shortname, description, color, content, confirm, mail_user, mail_frequency, mail_before_day, status, user_id, create_time, update_time, auto_relate)
+        VALUES (#{type}, #{name}, #{shortname}, #{description}, #{color}, #{content}, #{confirm}, #{mailUser}, #{mailFrequency}, #{mailBeforeDay}, #{status}, #{userId}, NOW(), NOW(), #{autoRelate})
+    </insert>
+
+    <!--Update-->
+    <update id="updateMatterTemplate" parameterType="MatterTemplate">
+        UPDATE bpms_matter_template SET
+        `type` = #{type},
+        `name` = #{name},
+        shortname = #{shortname},
+        description = #{description},
+        color = #{color},
+        content= #{content},
+        confirm=#{confirm},
+        mail_user=#{mailUser},
+        mail_before_day=#{mailBeforeDay},
+        mail_frequency=#{mailFrequency},
+        status=#{status},
+        user_id=#{userId},
+        auto_relate=#{autoRelate},
+        update_time= NOW()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateStatusById">
+        UPDATE bpms_matter_template SET status=1 WHERE id=#{id}
+    </update>
+    <delete id="deleteById">
+        DELETE FROM bpms_matter_template WHERE id = #{id}
+    </delete>
+    <update id="updateStatusByIds">
+        UPDATE bpms_matter_template SET status=1 WHERE id IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <delete id="deleteByIds">
+        DELETE FROM bpms_matter_template WHERE id IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findByCompanyId" resultMap="matterTemplateResultMap">
+        SELECT t1.*,sysuser.name userName,
+        t4.id rule_id,t4.template_id rule_template_id,t4.type rule_type,t4.remind_date rule_remind_date,t4.complete_date rule_complete_date,t4.before_day rule_before_day,t4.create_time rule_create_time,t4.complete_before_day rule_complete_before_day,
+        t5.id attachment_id,t5.template_id attachment_template_id,t5.type attachment_type,t5.name attachment_name,t5.url attachment_url,t5.description attachment_description,t5.create_time attachment_create_time
+        FROM bpms_matter_template t1
+        JOIN bpms_company_matter t2 ON t1.id=t2.template_id
+        JOIN bpms_company t3 ON t2.company_name=t3.`name` AND t3.`status`=0
+        LEFT JOIN bpms_template_rule t4 ON t1.id=t4.template_id
+        LEFT JOIN bpms_template_attachment t5 ON t1.id=t5.template_id
+        LEFT JOIN sys_user sysuser ON t1.user_id=sysuser.id
+        WHERE  t1.`status`=0 AND t3.id=#{companyId}
+    </select>
+
+    <select id="findByTemplateId" resultMap="matterTemplateResultMap">
+        SELECT t1.*,sysuser.name userName, 0 rightLine,
+        t2.id rule_id,t2.template_id rule_template_id,t2.type rule_type,t2.remind_date rule_remind_date,t2.complete_date rule_complete_date,t2.before_day rule_before_day,t2.create_time rule_create_time,t2.complete_before_day rule_complete_before_day,
+        t3.id attachment_id,t3.template_id attachment_template_id,t3.type attachment_type,t3.name attachment_name,t3.url attachment_url,t3.description attachment_description,t3.create_time attachment_create_time
+        FROM bpms_matter_template t1
+        LEFT JOIN sys_user sysuser ON t1.user_id=sysuser.id
+        LEFT JOIN bpms_template_rule t2 ON t1.id=t2.template_id
+        LEFT JOIN bpms_template_attachment t3 ON t1.id=t3.template_id
+        WHERE t1.id=#{id}
+    </select>
+
+</mapper>

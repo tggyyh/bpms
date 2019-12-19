@@ -1,0 +1,22 @@
+<script th:src="@{/js/app/bpms/role/rolepermission.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <input type="hidden" id="roleId" th:value="${role.id}"></input>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="width: 30%">模块名称</th>
+                            <th>操作权限</th>
+                        </tr>
+                        </thead>
+                        <tbody id="roleBody">
+                        </tbody>
+                    </table>
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-5">
+                            <button id="save" name="save" class="btn btn-primary" type="button">保存
+                            </button>
+                        </div>
+                    </div>
+
+</div>

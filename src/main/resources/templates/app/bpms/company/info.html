@@ -1,0 +1,41 @@
+
+<div class="wrapper wrapper-content">
+    <input type="hidden" id="hidCompanyId" th:value="${companyId}"/>
+    <input type="hidden" id="hidCompanyName" th:value="${companyName}"/>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container font-color-black">
+                <ul id="companyTab" class="nav nav-tabs layer-tabs">
+                    <li class="col-sm-4 active">
+                        <a id="tab-company" data-toggle="tab" href="#tab-infoCompany" aria-expanded="true">发行人基本信息</a>
+                    </li>
+                    <li class="col-sm-4">
+                        <a id="tab-mattertemplte" data-toggle="tab" href="#tab-infoMattertemplate" aria-expanded="false">发行人关联事项</a>
+                    </li>
+                    <li class="col-sm-4">
+                        <a id="tab-attachment" data-toggle="tab" href="#tab-infoAttachment" aria-expanded="false">事项材料存档</a>
+                    </li>
+                </ul>
+                <div class="tab-content padding-top-1">
+                    <div id="tab-infoCompany" class="tab-pane active">
+                        <div id="divInfoCompany" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-infoMattertemplate" class="tab-pane">
+                        <div id="divInfoMattertemplate" class="panel-body">
+
+                        </div>
+                    </div>
+                    <div id="tab-infoAttachment" class="tab-pane">
+                        <div id="divInfoAttachment" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/company/info.js}"></script>

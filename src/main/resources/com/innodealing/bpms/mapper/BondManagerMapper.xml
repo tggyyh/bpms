@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.BondManagerMapper">
+
+    <resultMap id="bondManagerResultMap" type="BondManager">
+        <result property="id" column="id"/>
+        <result property="bondCode" column="bond_code"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+
+        <collection property="sysUser" ofType="User">
+            <id property="id" column="sysuser_id"/>
+            <result property="tid" column="sysuser_tid"/>
+            <result property="name" column="sysuser_name"/>
+            <result property="accountNumber" column="sysuser_account_number"/>
+            <result property="password" column="sysuser_password"/>
+            <result property="email" column="sysuser_email"/>
+            <result property="phone" column="sysuser_phone"/>
+            <result property="loginStatus" column="sysuser_login_status"/>
+            <result property="status" column="sysuser_status"/>
+            <result property="createTime" column="sysuser_create_time"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByBondCode" resultMap="bondManagerResultMap">
+        SELECT
+        t1.*,
+        t2.id sysuser_id,t2.name sysuser_name,t2.account_number sysuser_account_number
+        FROM bpms_bond_manager t1
+        LEFT JOIN sys_user t2 ON t1.user_id=t2.id
+        WHERE t1.bond_code=#{bondCode}
+    </select>
+
+    <select id="findByBondCodes" resultMap="bondManagerResultMap">
+        SELECT
+          t1.*,
+          t2.id sysuser_id,t2.name sysuser_name,t2.account_number sysuser_account_number
+        FROM bpms_bond_manager t1
+        LEFT JOIN sys_user t2 ON t1.user_id=t2.id
+        WHERE 1=1
+        <if test="bondCodes != null and bondCodes.length>0">
+            AND
+            <foreach collection="bondCodes" item="codeItem"  open="(" separator=" OR " close=")">
+                t1.bond_code=#{codeItem}
+            </foreach>
+        </if>
+    </select>
+
+    <!--Insert-->
+    <insert id="insertBondManager" useGeneratedKeys="true" keyProperty="id" parameterType="BondManager">
+        INSERT INTO bpms_bond_manager (bond_code, user_id, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.bondCode}, #{item.userId}, NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteByBondCode">
+        DELETE FROM bpms_bond_manager WHERE bond_code=#{bondCode}
+    </delete>
+
+</mapper>

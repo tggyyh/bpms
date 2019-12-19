@@ -1,0 +1,39 @@
+
+<div class="wrapper wrapper-content">
+    <input type="hidden" id="hidBondId" th:value="${bondId}"/>
+    <input type="hidden" id="hidBondCode" th:value="${bondCode}"/>
+    <input type="hidden" id="hidCompanyId" th:value="${companyId}"/>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container font-color-black">
+                <ul id="bondTab" class="nav nav-tabs layer-tabs">
+                    <li class="col-sm-4 active">
+                        <a id="tab-bond" data-toggle="tab" href="#tab-infoBond" aria-expanded="true">项目基本信息</a>
+                    </li>
+                    <li class="col-sm-4">
+                        <a id="tab-mattertemplte" data-toggle="tab" href="#tab-infoMattertemplate" aria-expanded="false">项目关联事项</a>
+                    </li>
+                    <li class="col-sm-4">
+                        <a id="tab-attachment" data-toggle="tab" href="#tab-infoAttachment" aria-expanded="false">事项材料存档</a>
+                    </li>
+                </ul>
+                <div class="tab-content padding-top-1">
+                    <div id="tab-infoBond" class="tab-pane active">
+                        <div id="divInfoBond" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-infoMattertemplate" class="tab-pane">
+                        <div id="divInfoMattertemplate" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-infoAttachment" class="tab-pane">
+                        <div id="divInfoAttachment" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/bond/info.js}"></script>

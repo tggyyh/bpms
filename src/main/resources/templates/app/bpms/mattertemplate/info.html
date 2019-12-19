@@ -1,0 +1,28 @@
+<script th:src="@{/js/app/bpms/mattertemplate/info.js}"></script>
+<div class="wrapper wrapper-content">
+    <input type="hidden" id="hidTemplateId" th:value="${templateId}"/>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container font-color-black">
+                <ul id="templateTab" class="nav nav-tabs layer-tabs">
+                    <li class="col-sm-6 active">
+                        <a id="tab-template" data-toggle="tab" href="#tab-infoTemplate" aria-expanded="true">编辑事项</a>
+                    </li>
+                    <li class="col-sm-6">
+                        <a id="tab-history" data-toggle="tab" href="#tab-infoHistory" aria-expanded="false">历史记录</a>
+                    </li>
+                </ul>
+                <div class="tab-content padding-top-1">
+                    <div id="tab-infoTemplate" class="tab-pane active">
+                        <div id="divInfoTemplate" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-infoHistory" class="tab-pane">
+                        <div id="divInfoHistory" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

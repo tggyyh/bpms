@@ -1,0 +1,32 @@
+
+<div class="wrapper wrapper-content">
+    <input type="hidden" id="hidTaskId" th:value="${taskId}"/>
+    <input type="hidden" id="hidPId" th:value="${pId}"/>
+    <input type="hidden" id="hidOrderIndex" th:value="${orderIndex}"/>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container font-color-black">
+                <ul id="viewTab" class="nav nav-tabs layer-tabs">
+                    <li class="col-sm-6 active">
+                        <a id="tab-view" data-toggle="tab" href="#tab-view-info" aria-expanded="true">查看事项</a>
+                    </li>
+                    <li class="col-sm-6">
+                        <a id="tab-history" data-toggle="tab" href="#tab-history-info" aria-expanded="false">查看历史</a>
+                    </li>
+                </ul>
+                <div class="tab-content padding-top-1">
+                    <div id="tab-view-info" class="tab-pane active">
+                        <div id="divView" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-history-info" class="tab-pane">
+                        <div id="divHistory" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/inspector-trace-matter/info.js}"></script>

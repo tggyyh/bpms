@@ -1,0 +1,49 @@
+<input id="hidBondManCode" name="hidBondManCode" type="hidden" />
+<input id="hidBondManId" name="hidBondManId" type="hidden" />
+<input id="hidBondManName" name="hidBondManName" type="hidden" />
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <table id="tabInfoLinkBond" class="linkman-table">
+            <tr class="linkman-header">
+                <td th:class="td-v">债券简称/代码</td>
+                <td class="td-v">项目负责人</td>
+                <td class="td-e">编辑</td>
+            </tr>
+            <tr th:each="bond,bondStat:${bondList}">
+                <td>
+                    <div class="linkman-bond">
+                        <div class="linkman-bond-name" th:text="null==${bond.shortname}?'':${bond.shortname}"></div>
+                        <div name="linkmanBondCode" class="linkman-bond-code" th:text="null==${bond.code}?'':${bond.code}"></div>
+                    </div>
+                </td>
+                <td>
+                    <div name="divBondManId" class="hidden">
+                        <span th:each="sysuser,sysuserStat:${bond.bondManagerList}" th:id="'manId-'+${sysuser.sysUser.id}" name="manId"></span>
+                    </div>
+                    <div class="linkman-viewtext">
+                        <span th:each="sysuser,sysuserStat:${bond.bondManagerList}" th:text="${sysuserStat.last}?${sysuser.sysUser.name}:(${sysuser.sysUser.name}+'、')"></span>
+                    </div>
+                    <div class="linkman-edittext hide">
+                        <select class="selectpicker" multiple="multiple" data-style="btn-white">
+                            <option th:each="sysUser,sysUserStat:${userList}" th:value="${sysUser.id}" th:text="${sysUser.name}"></option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-option-e">
+                        <span class="linkman-span-option" onclick="viewBondMan(this)">查看</span>
+                        <shiro:hasPermission name="project-manage:edit">
+                        <span class="linkman-span-option" onclick="editBondMan(this)">修改</span>
+                        </shiro:hasPermission>
+                    </div>
+                    <div class="linkman-option-s hide">
+                        <span class="linkman-span-option-s" onclick="saveBondMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="cancelBondMan(this)">取消 </span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/companylinkman/bondmanagerlist.js}"></script>

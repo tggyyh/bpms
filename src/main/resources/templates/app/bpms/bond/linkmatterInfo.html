@@ -1,0 +1,29 @@
+<script th:src="@{/js/app/bpms/bond/linkmatterInfo.js}"></script>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <input type="hidden" id="hidMatterType" th:value="${matterType}"/>
+        <input type="hidden" id="hidBondCode" th:value="${bondCode}"/>
+        <div class="col-sm-12">
+            <div class="tabs-container font-color-black">
+                <ul id="linkmatterTab" class="nav nav-tabs layer-tabs">
+                    <li class="col-sm-6 active">
+                        <a id="tab-linkmatter" data-toggle="tab" href="#tab-infoLinkmatter" aria-expanded="true">关联事项</a>
+                    </li>
+                    <li class="col-sm-6">
+                        <a id="tab-history" data-toggle="tab" href="#tab-infoHistory" aria-expanded="false">历史记录</a>
+                    </li>
+                </ul>
+                <div class="tab-content padding-top-1">
+                    <div id="tab-infoLinkmatter" class="tab-pane active">
+                        <div id="divInfoLinkmatter" class="panel-body">
+                        </div>
+                    </div>
+                    <div id="tab-infoHistory" class="tab-pane">
+                        <div id="divInfoHistory" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

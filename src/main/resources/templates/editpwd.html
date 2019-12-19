@@ -1,0 +1,115 @@
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="pwdForm" class="form-horizontal m-t" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*当前密码：</label>
+                            <div class="col-sm-4 input-group input-group-padding">
+                                <input id="password" name="password" type="password" class="form-control" aria-required="true" aria-invalid="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*新密码：</label>
+                            <div class="col-sm-4 input-group input-group-padding">
+                                <input id="newPassword" name="newPassword" type="password" class="form-control" aria-required="true" aria-invalid="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*确认新密码：</label>
+                            <div class="col-sm-4 input-group input-group-padding">
+                                <input id="reNewPassword" name="reNewPassword" type="password" class="form-control" aria-required="true" aria-invalid="true" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-11 col-sm-offset-4 right">
+                                <button id="btn_PWDSave" class="btn btn-primary" type="button">修改</button>&nbsp;&nbsp;
+                                <button id="btn_PWDCancel" class="btn btn-primary" type="button">关闭</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        //保存
+        $("#btn_PWDSave").click(function () {
+            if(pwdValidate().form()){
+                var form = new FormData(document.getElementById("pwdForm"));
+                $.ajax({
+                    url: contextPath + "/editPwdSave",
+                    type:"post",
+                    data:form,
+                    processData:false,
+                    contentType:false,
+                    success:function(data){
+                        if(data.code==0){
+                            layer.alert(data.message, {icon: 1, time: 3000});
+                            layer.close(pwdPageIndex);
+                        }else{
+                            layer.alert(data.message, {icon: 1, time: 3000});
+                        }
+                    },
+                    error:function(e){
+                        layer.close(pwdPageIndex);
+                        layer.alert('修改密码失败', {icon: 1, time: 3000});
+                    }
+                });
+            }
+        });
+
+        $("#btn_PWDCancel").click(function(){
+            layer.close(pwdPageIndex);
+        });
+
+    });
+
+
+    function pwdValidate(){
+        var icon = '<i class="fa fa-times-circle"></i>' ;
+        return $("#pwdForm").validate({
+            rules: {
+                password: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 32
+                },
+                newPassword: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 32
+                },
+                reNewPassword: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 32,
+                    equalTo:"#newPassword",
+                }
+            },
+            messages: {
+                password: {
+                    required: icon + "请输入当前密码",
+                    minlength: icon + "密码长度为 6-32 位",
+                    maxlength: icon + "密码长度为 6-32 位"
+                },
+                newPassword: {
+                    required: icon + "请输入新密码",
+                    minlength: icon + "密码长度为 6-32 位",
+                    maxlength: icon + "密码长度为 6-32 位"
+                },
+                reNewPassword: {
+                    required: icon + "请输入确认新密码",
+                    minlength: icon + "密码长度为 6-32 位",
+                    maxlength: icon + "密码长度为 6-32 位",
+                    equalTo: icon + "两次密码输入不一致"
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CompanyLinkmanMapper">
+
+    <select id="findByCompanyId" resultType="CompanyLinkman">
+        SELECT t1.*
+        FROM bpms_company_linkman t1 JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        WHERE t2.id=#{companyId}
+    </select>
+
+    <select id="findByCompanyName" resultType="CompanyLinkman">
+        SELECT t1.*
+        FROM bpms_company_linkman t1 JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        WHERE t1.company_name=#{companyName}
+    </select>
+
+    <insert id="insertCompanyLinkman" useGeneratedKeys="true" keyProperty="id" parameterType="CompanyLinkman">
+        INSERT INTO bpms_company_linkman (company_name, name, phone, mobile, mail, create_time)
+        VALUES (#{companyName}, #{name}, #{phone}, #{mobile}, #{mail}, NOW())
+    </insert>
+
+    <insert id="insertCompanyLinkmans" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_company_linkman (company_name, name, phone, mobile, mail, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.companyName}, #{item.name}, #{item.phone}, #{item.mobile}, #{item.mail}, NOW())
+        </foreach>
+    </insert>
+
+    <update id="updateCompanyLinkman" parameterType="CompanyLinkman">
+        UPDATE bpms_company_linkman SET name=#{name}, phone=#{phone}, mobile=#{mobile}, mail=#{mail} WHERE id=#{id}
+    </update>
+
+    <delete id="deleteCompanyLinkman">
+        DELETE FROM bpms_company_linkman WHERE id=#{id}
+    </delete>
+
+    <delete id="deleteAllByCompanyName">
+        DELETE FROM bpms_company_linkman WHERE company_name=#{companyName}
+    </delete>
+
+</mapper>

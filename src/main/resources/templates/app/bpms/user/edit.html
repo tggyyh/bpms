@@ -1,0 +1,34 @@
+<script th:src="@{/js/app/bpms/user/edit.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="userForm" class="form-horizontal m-t">
+                        <input type="hidden" name="id" th:value="${user.id}"/>
+
+                        <div class="form-group">
+                        <label class="col-sm-3 control-label">角色：</label>
+                            <div class="col-sm-4">
+                                <select id="roleId" name="roleId" class="form-control" aria-required="true"
+                                        aria-invalid="true">
+                                    <option value="">请选择</option>
+                                    <option th:if="${role}!=null" th:each="item :${roles}" th:selected="${item.id}==${role.id}?'selected'" th:value="${item.id}" th:text="${item.name}" ></option>
+                                    <option th:if="${role}==null" th:each="item :${roles}" th:value="${item.id}" th:text="${item.name}" ></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-5">
+                                <button id="editSave" name="editSave" class="btn btn-primary" type="button">提交
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

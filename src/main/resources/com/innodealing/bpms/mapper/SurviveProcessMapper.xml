@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.SurviveProcessMapper">
+    <select id="findCompanyProcess" resultType="SurviveProcess">
+        SELECT a.id AS matterId,c.type as type,a.template_id AS templateId,
+          b.id AS ruleId,b.type AS ruleType,c.confirm,a.company_name AS companyName,
+           b.remind_date as remindDate,b.complete_date as completeDate
+           FROM
+          bpms_company_matter a INNER JOIN bpms_template_rule b
+          ON a.`template_id`=b.`template_id`
+          INNER JOIN `bpms_matter_template` c
+          ON a.`template_id`=c.id
+          WHERE b.`type`=0 and c.status=0 and a.status=0
+    </select>
+    <select id="findBondProcess" resultType="SurviveProcess">
+          SELECT a.id AS matterId,d.type as type,a.template_id AS templateId,
+          c.id AS ruleId ,d.`confirm`,b.code AS bondCode,
+          b.shortname AS bondShortname,b.company_name AS companyName,
+          b.value_date AS valueDate,
+          b.pay_day as payDay,
+          b.pay_frequency as payFrequency,
+          c.type AS ruleType,
+            c.remind_date AS remindDate,
+            c.complete_date AS completeDate,
+            c.before_day AS beforeDay,
+            c.complete_before_day AS completeBeforeDay
+           FROM bpms_bond_matter a INNER JOIN `bpms_bond` b
+          ON a.bond_code=b.code
+           INNER JOIN bpms_template_rule c
+          ON a.`template_id`=c.`template_id`
+          INNER JOIN `bpms_matter_template` d
+          ON a.`template_id`=d.id
+          WHERE  d.`status`=0 AND b.STATUS=0
+    </select>
+    <select id="findCustomBondProcess" resultType="SurviveProcess">
+          SELECT a.id AS customId,a.type, c.id AS ruleId,a.confirm,a.key AS bondCode,
+        b.shortname AS bondShortname,b.company_name AS companyName,
+        c.remind_date AS remindDate,c.complete_date AS completeDate,
+         b.value_date AS valueDate,
+          b.pay_day as payDay,
+          b.pay_frequency as payFrequency,
+         c.type AS ruleType,
+         c.before_day AS beforeDay,
+         c.complete_before_day AS completeBeforeDay
+         FROM bpms_custom_matter a
+        INNER JOIN bpms_bond b ON b.code=a.key
+        INNER JOIN bpms_custom_rule  c ON a.id=c.custom_id
+        WHERE a.type=1 AND a.relation=1 AND b.STATUS=0 and a.right_line=0
+    </select>
+    <select id="findCustomCompanyProcess" resultType="SurviveProcess">
+    SELECT a.id AS customId,a.type, c.id AS ruleId,c.type AS ruleType,a.confirm,b.name AS companyName,
+        c.remind_date AS remindDate,c.complete_date AS completeDate
+        FROM bpms_custom_matter a
+        INNER JOIN bpms_company b ON b.name=a.key
+        INNER JOIN bpms_custom_rule  c ON a.id=c.custom_id
+        WHERE a.type=0 AND c.type=0 AND a.relation=1
+    </select>
+    <insert id="insertSurviveProcess" useGeneratedKeys="true" keyProperty="id">
+        insert into bpms_survive_process (type, process_id, matter_id, template_id,rule_id,custom_id,order_index,status) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.type},#{item.processId}, #{item.matterId}, #{item.templateId}, #{item.ruleId},#{item.customId},#{orderIndex},0)
+        </foreach>
+    </insert>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into bpms_survive_process (type, process_id, matter_id, template_id,rule_id,custom_id,order_index,status) values
+        (#{type},#{processId}, #{matterId}, #{templateId}, #{ruleId},#{customId},#{orderIndex},0)
+    </insert>
+    <!--Update-->
+    <update id="updateSurviveProcess">
+        update bpms_survive_process set status=#{param0},end_time=NOW() where process_id=#{param1}
+    </update>
+
+    <select id="findRightLineProcess" resultType="SurviveProcess">
+        SELECT a.id AS customId,a.type, a.confirm,a.key AS bondCode,
+         b.shortname AS bondShortname,b.company_name AS companyName,
+         b.value_date AS valueDate,
+         b.pay_day as payDay,
+         b.pay_frequency as payFrequency,
+         1 AS ruleType,
+         d.before_day AS beforeDay,
+         d.complete_before_day AS completeBeforeDay,
+         d.order_index AS orderIndex,
+         d.name AS subName,
+         d.order_index as orderIndex,
+         d.content as content,
+         d.mail_before_day as mailBeforeDay,
+         d.mail_frequency AS mailFrequency
+         FROM bpms_custom_matter a
+        INNER JOIN bpms_bond b ON b.code=a.key
+--         INNER JOIN bpms_custom_rule  c ON a.id=c.custom_id
+        LEFT JOIN `bpms_custom_sub_matter` d ON a.id=d.custom_id
+        WHERE a.type=1 AND a.relation=1 AND a.status=0 AND b.STATUS=0 AND a.right_line=1
+        ORDER BY custom_id ASC,orderIndex DESC
+    </select>
+    <select id="findOrderIndexByProcessId" resultType="Integer">
+        SELECT order_index FROM bpms_survive_process
+        WHERE process_id=#{processId}
+    </select>
+
+    <select id="findByTemplateId" resultType="SurviveProcess">
+        SELECT t1.*,t2.company_name,t2.bond_code,t2.bond_shortname,t2.remind_date,t2.complete_date
+        FROM bpms_survive_process t1 JOIN bpms_process_info t2 ON t1.process_id=t2.process_id AND t1.status!=2
+        WHERE t1.template_id=#{templateId} AND t2.remind_date=#{remindDate}
+    </select>
+
+    <select id="findSameRemind" resultType="Integer">
+        select count(0) from bpms_survive_process a
+        INNER JOIN bpms_process_info b on a.process_id=b.process_id
+        where a.type=#{type}
+        and a.template_id=#{templateId}
+        and a.custom_id=#{customId}
+        and a.rule_id=#{ruleId}
+        and a.order_index=#{orderIndex}
+        and b.company_name=#{companyName}
+        <if test="bondCode !=null and bondCode !='' ">
+            and b.bond_code=#{bondCode}
+        </if>
+         and a.status!=4
+        and DATE_FORMAT(a.create_time,'%Y-%m-%d')= DATE_FORMAT(NOW(),'%Y-%m-%d')
+    </select>
+</mapper>

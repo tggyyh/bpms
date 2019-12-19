@@ -1,0 +1,197 @@
+<script th:src="@{/js/app/bpms/handle-matter/re-handle-right-line-matter.js}"></script>
+<script th:src="@{/js/common/file.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="taskForm" class="form-horizontal m-t" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input id="id" name="taskId" type="hidden" th:value="${matterTask.id}"
+                                   class="form-control"/>
+                            <input id="processId" name="processId" type="hidden"
+                                   th:value="${matterTask.processInfo.processId}" class="form-control"/>
+                            <input id="type" name="type" type="hidden" th:value="${matterTask.processInfo.type}"
+                                   class="form-control"/>
+                            <input id="companyName" name="companyName" type="hidden"
+                                   th:value="${matterTask.processInfo.companyName}" class="form-control"/>
+                            <input id="bondCode" name="bondCode" type="hidden"
+                                   th:value="${matterTask.processInfo.bondCode}" class="form-control"/>
+                            <input id="bondShortname" name="bondShortname" type="hidden"
+                                   th:value="${matterTask.processInfo.bondShortname}" class="form-control"/>
+
+                            <div class="col-sm-3">
+                                <div class="col-sm-12 td-div-icon" th:text="${matterTask.processInfo.shortname}"
+                                     th:style="'float:right;background-color:'+${matterTask.processInfo.color}+';border-color:'+${matterTask.processInfo.color}+';'"></div>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <div style="padding: 6px" id="name" th:text="${matterTask.processInfo.name}"></div>
+                                <div style="padding: 6px" th:text="${matterTask.processInfo.description}"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">提醒时间：</div>
+                            <span class="col-sm-2" id="remindDate" name="remindDate"
+                                  th:text="${#dates.format(matterTask.processInfo.remindDate, 'yyyy-MM-dd')}"/>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">模板材料：</div>
+                            <div class="col-sm-8 tmp-bgcolor-y">
+                                <span class="fa fa-paperclip tmp-font-20 tmp-padding-5"></span>
+                                <span class="tmp-padding-5">共<span id="spanFileNum"></span>个文件</span>
+                                <span id="fileDownloadAll" class="tmp-link tmp-padding-5">全部下载</span>
+                            </div>
+
+                            <label class="col-sm-3 control-label"></label>
+                            <div id="tmpFiles" class="col-sm-8">
+                                <div class="file-list" th:each="attachment : ${matterTask.processInfo.processTemplateAttachmentList}">
+                                    <input type="hidden" name="type" th:value="${attachment.type}"/>
+                                    <input type="hidden" name="name" th:value="${attachment.name}"/>
+                                    <input type="hidden" name="url" th:value="${attachment.url}"/>
+                                    <span class="file-title" th:title="${attachment.name}" th:text="${attachment.name}">
+                                    </span>
+                                    <a class="file-down" onclick="downFile(this)">下载</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <dib class="col-sm-3 text-right">督导确认：</dib>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.confirm}==1">
+                                <span>需要</span>
+                            </div>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.confirm}==0">
+                                <span>不需要</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">触发通知：</div>
+                            <div class="col-sm-6">
+                                <input id="mailUserHidden" type="hidden" th:value="${matterTask.processInfo.mailUser}"/>
+                                <span id="mailUser"></span>
+                            </div>
+                        </div>
+
+                        <div class="sub-matter-color">
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">子事项<span th:text="${matterTask.orderIndex}"></span>:
+                                </div>
+                                <div class="col-sm-4">
+                                    <span th:text="${matterTask.processInfo.subName}"></span>
+                                </div>
+                                <div class="col-sm-4 text-right">
+                                    <span class="handle-matter-status">等待处理</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">需完成时间：</div>
+                                <div class="col-sm-3">
+                                    <span th:text="${#dates.format(matterTask.processInfo.completeDate, 'yyyy-MM-dd')}"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">提醒频率：</div>
+                                <div class="col-sm-6">
+                                    <span>需完成时间提前</span>
+                                    <span style="color:red;" id="mailBeforeDay" th:text="${matterTask.processInfo.mailBeforeDay}"></span>
+                                    <span>工作日开始，每隔</span>
+                                    <span style="color:red;" id="mailFrequency" th:text="${matterTask.processInfo.mailFrequency}"></span>
+                                    <span>工作日  项目负责人仍未提交处理，将再次邮件提醒项目负责人</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">事项内容：</div>
+                                <div class="col-sm-8" th:utext="${matterTask.processInfo.content}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">退回理由：</div>
+                                <div class="col-sm-8">
+                                    <textarea id="reason" readonly="readonly" rows="5" name="reason"
+                                              th:text="${matterTask.processInfo.reason}" class="form-control"
+                                              required="" aria-required="true"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">上传事项材料：
+                                </div>
+                                <div class="col-sm-8 tmp-bgcolor-y">
+                                    <span class="fa fa-paperclip tmp-font-20 tmp-padding-5"></span>
+                                    <span class="tmp-padding-5">共<span id="spanFileNumR"></span>个文件</span>
+                                    <span id="fileDownloadAllR" class="tmp-link tmp-padding-5">全部下载</span>
+                                    <span id="fileRemoveAll" class="tmp-link tmp-font-red tmp-padding-5">全部删除</span>
+                                </div>
+
+                                <label class="col-sm-3 control-label"></label>
+                                <div id="tmpFilesR" class="col-sm-8">
+                                    <div class="file-list" th:each="attachment : ${matterTask.processInfo.processAttachmentList}">
+                                        <input type="hidden" name="type" th:value="${attachment.type}"/>
+                                        <input type="hidden" name="name" th:value="${attachment.name}"/>
+                                        <input type="hidden" name="url" th:value="${attachment.url}"/>
+                                        <span class="file-title" th:title="${attachment.name}" th:text="${attachment.name}">
+                                    </span>
+                                        <a class="file-down" onclick="downFile(this)">下载</a>
+                                        <a class="file-remove" onclick="fileRemoveR(this)">删除</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-8" id="addDiv">
+                                    <input id="uploadFile" name="file" multiple="multiple" class="file hide" type="file"
+                                           onchange="setFileR(this)"/>
+                                    <div id="addFile" class="glyphicon glyphicon-plus-sign tmp-time-plus">
+                                        <span>添加所需材料</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3 text-right">处理说明：</div>
+                                <div class="col-sm-8">
+                                    <span th:text="${matterTask.processInfo.mark}"/>
+                                </div>
+                                <label class="col-sm-3 control-label"></label>
+                                <div class="col-sm-8">
+                                    <textarea id="mark" name="mark" rows="5" type="text" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sub-matter-color" th:each="mt :${matterTasks}">
+                            <div class="form-group" th:if="${matterTask.id!=mt.id}">
+                                <div class="col-sm-3 text-right">子事项<span th:text="${mt.orderIndex}"></span>:</div>
+                                <div class="col-sm-4">
+                                    <span th:text="${mt.processInfo.subName}"></span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==2">
+                                    <span class="handle-matter-status">等待处理</span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==8">
+                                    <span class="handle-matter-status">等待处理</span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==4">
+                                    <span class="check-matter-status">等待审核</span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==16">
+                                    <span class="check-matter-status">等待审核</span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==32">
+                                    <span class="over-matter-status">事项完成</span>
+                                </div>
+                                <div class="col-sm-4 text-right" th:if="${mt.processInfo.status}==64">
+                                    <span class="over-matter-status">事项取消</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-5">
+                                <button id="taskPass" name="taskPass" class="btn btn-info" type="button">提交
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hidField" value="1"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

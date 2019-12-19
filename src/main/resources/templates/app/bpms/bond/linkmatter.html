@@ -1,0 +1,170 @@
+<script th:src="@{/js/app/bpms/bond/linkmatter.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div id="divLinkmatter" class="col-sm-12 linkmatter-overflow-y">
+
+            <div class="ibox">
+
+                <div class="ibox-content padding-top-0">
+                    <input type="hidden" id="hidBondCode" th:value="${bondCode}"/>
+                    <div class="project-list tmp-list">
+                        <table id="tabInfoLinkBond" class="table">
+                            <tbody>
+                            <tr>
+                                <td colspan="4">
+                                    <div class="row tmp-title">
+                                        <span>
+                                            <input type="checkbox" id="cbxMatterAll" />
+                                        </span>
+                                        <span id="spanBondTemp" class="glyphicon glyphicon-triangle-bottom cursor-pointer">&nbsp;项目模板事项：</span>
+                                        <span th:text="${matterCount}"></span>
+                                        <span class="tmp-font-orgred">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;已关联：</span>
+                                        <span id="spanLinkCount" class="tmp-font-red" th:text="null==${linkMatterTemplateList}?'0':${linkMatterTemplateList.size()}"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tr-hover tr-bond" th:each="linkTemp,linkTempStat:${linkMatterTemplateList}">
+                                <td>
+                                    <input type="checkbox" name="cbxMatterItem" th:value="${linkTemp.id}" checked="checked" />
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-name-row">
+                                        <div class="tmp-border-right">
+                                            <div class="tmp-icon" th:text="${linkTemp.shortname}" data-toggle="tooltip" th:title="${linkTemp.shortname}" th:style="'background-color:'+${linkTemp.color}+';border-color:'+${linkTemp.color}"></div>
+                                            <div class="tmp-content">
+                                                <div class="content-name" th:text="${linkTemp.name}" data-toggle="tooltip" th:title="${linkTemp.name}"></div>
+                                                <div class="content-text" th:text="${linkTemp.description}" data-toggle="tooltip" th:title="${linkTemp.description}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-rule-row">
+                                        <div class="tmp-border-right linkmatter-noborder">
+                                            <div>提醒规则：</div>
+                                            <div class="tmp-rule" th:if="${linkTemp.templateRuleList[0].type}==0">
+                                                <div th:each="templateRule,templateRuleStat:${linkTemp.templateRuleList}" th:if="${templateRule.type}==0" th:class="${templateRuleStat.index}&gt;1?'hide'">
+                                                    <span>提醒：<span th:text="${#dates.format(templateRule.remindDate, 'MM月dd日')}"></span></span>&nbsp;&nbsp;
+                                                    <span>需完成：<span th:text="${#dates.format(templateRule.completeDate, 'MM月dd日')}"></span></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="tmp-rule"  th:if="${linkTemp.templateRuleList[0].type}==1">
+                                                <div th:each="templateRule,templateRuleStat:${linkTemp.templateRuleList}">
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        提醒：
+                                                        <span th:text="'付息日 提前' + ${templateRule.beforeDay} + '工作日'"></span>
+                                                    </span>&nbsp;
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        需完成：
+                                                        <span th:text="'付息日 提前' + ${templateRule.completeBeforeDay} + '工作日'"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div th:if="${linkTemp.templateRuleList}!=null and ${linkTemp.templateRuleList.size()}&gt;2" class="tmp-link" onclick="loadRuleMore(this)">
+                                                更多
+                                            </div>
+                                            <div class="tmp-rule-tip hide">
+                                                <div class="glyphicon glyphicon-remove text-right tmp-rule-tip-close" onclick="closeRuleMore(this)"></div>
+                                                <div class="tmp-rule-tip-content">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr class="tr-hover tr-bond" th:each="matterTemp,matterTempStat:${matterTemplateList}">
+                                <td>
+                                    <input type="checkbox" name="cbxMatterItem" th:value="${matterTemp.id}" />
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-name-row">
+                                        <div class="tmp-border-right">
+                                            <div class="tmp-icon" th:text="${matterTemp.shortname}" data-toggle="tooltip" th:title="${matterTemp.shortname}" th:style="'background-color:'+${matterTemp.color}+';border-color:'+${matterTemp.color}"></div>
+                                            <div class="tmp-content">
+                                                <div class="content-name" th:text="${matterTemp.name}" data-toggle="tooltip" th:title="${matterTemp.name}"></div>
+                                                <div class="content-text" th:text="${matterTemp.description}" data-toggle="tooltip" th:title="${matterTemp.description}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-rule-row">
+                                        <div class="tmp-border-right linkmatter-noborder">
+                                            <div>提醒规则：</div>
+                                            <div class="tmp-rule" th:if="${matterTemp.templateRuleList[0].type}==0">
+                                                <div th:each="templateRule,templateRuleStat:${matterTemp.templateRuleList}" th:if="${templateRule.type}==0" th:class="${templateRuleStat.index}&gt;1?'hide'">
+                                                    <span>提醒：<span th:text="${#dates.format(templateRule.remindDate, 'MM月dd日')}"></span></span>&nbsp;&nbsp;
+                                                    <span>需完成：<span th:text="${#dates.format(templateRule.completeDate, 'MM月dd日')}"></span></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="tmp-rule"  th:if="${matterTemp.templateRuleList[0].type}==1">
+                                                <div th:each="templateRule,templateRuleStat:${matterTemp.templateRuleList}">
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        提醒：
+                                                        <span th:text="'付息日 提前' + ${templateRule.beforeDay} + '工作日'"></span>
+                                                    </span>&nbsp;
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        需完成：
+                                                        <span th:text="'付息日 提前' + ${templateRule.completeBeforeDay} + '工作日'"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div th:if="${matterTemp.templateRuleList}!=null and ${matterTemp.templateRuleList.size()}&gt;2" class="tmp-link" onclick="loadRuleMore(this)">
+                                                更多
+                                            </div>
+                                            <div class="tmp-rule-tip hide">
+                                                <div class="glyphicon glyphicon-remove text-right tmp-rule-tip-close" onclick="closeRuleMore(this)"></div>
+                                                <div class="tmp-rule-tip-content">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr id="trCustomHeader">
+                                <td colspan="4">
+                                    <div class="row tmp-title">
+                                        <input type="hidden" id="hidAddCustomId"/>
+                                        <span>
+                                            <input type="checkbox" id="cbxCustomMatterAll" />
+                                        </span>
+                                        <span id="spanCustomTemp" class="glyphicon glyphicon-triangle-bottom cursor-pointer">&nbsp;项目自定义事项：</span>
+                                        <span id="spanCustomCount" th:text="${customCount}"></span>
+                                        <span class="tmp-font-orgred">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;已关联：</span>
+                                        <span id="spanCustomLinkCount" class="tmp-font-red" th:text="${customLinkCount}"></span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="4">
+                                    <button type="button" id="btnCustomMatterAdd" class="btn btn-w-m btn-warning">新建项目自定义事项</button>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12 text-center linkmatter-footer">
+                <button type="button" id="btnLinkMatterEdit" class="btn btn-w-m btn-info">修改</button>
+                <button type="button" id="btnLinkMatterSave" class="btn btn-w-m btn-warning" disabled="disabled">保存</button>
+            </div>
+        </div>
+    </div>
+</div>

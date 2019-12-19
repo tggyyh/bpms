@@ -1,0 +1,24 @@
+
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <table id="tabInfoLinkBond" class="linkman-table">
+            <tr class="linkman-header">
+                <td class="td-v">债券简称/代码</td>
+                <td class="td-v">项目负责人</td>
+            </tr>
+            <tr th:each="bond,bondStat:${bondList}">
+                <td>
+                    <div class="linkman-bond">
+                        <div class="linkman-bond-name" th:text="null==${bond.shortname}?'':${bond.shortname}"></div>
+                        <div name="linkmanBondCode" class="linkman-bond-code" th:text="null==${bond.code}?'':${bond.code}"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-viewtext">
+                        <span th:each="sysuser,sysuserStat:${bond.bondManagerList}" th:text="${sysuserStat.last}?${sysuser.sysUser.name}:(${sysuser.sysUser.name}+'、')"></span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

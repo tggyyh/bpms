@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title>一级存续管理系统</title>
+
+    <!--全局样式-->
+    <div th:replace="shared/sharedcss"></div>
+
+    <!--全局js-->
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+
+
+    <!-- 自定义js -->
+    <script th:src="@{/js/hplus/hplus.js?v=4.1.0}"></script>
+    <script th:src="@{/js/hplus/contabs.js}"></script>
+    <script th:src="@{/js/index.js}"></script>
+    <!-- 第三方插件 -->
+    <script th:src="@{/js/hplus/plugins/pace/pace.min.js}"></script>
+
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+<div id="wrapper">
+
+
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+
+        <!--header-->
+        <div th:replace="layout/header :: top"></div>
+
+        <!--tabs-->
+        <div th:replace="layout/main :: mainTab"></div>
+
+        <!--menu-->
+        <nav th:replace="layout/left :: leftMenu"></nav>
+
+        <!--content-->
+        <div th:replace="layout/main :: mainContent"></div>
+
+        <!--footer-->
+        <!--<div th:replace="layout/footer :: footer"></div>-->
+
+    </div>
+
+</div>
+</body>
+</html>

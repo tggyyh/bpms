@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.MatterTaskMapper">
+    <resultMap id="matterTaskResultMap" type="MatterTask">
+        <result property="id" column="ID_"/>
+        <result property="name" column="NAME_"/>
+        <result property="processId" column="process_id"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="createTime" column="CREATE_TIME_"/>
+
+        <association property="processInfo" javaType="ProcessInfo">
+            <id property="id" column="id"/>
+            <result property="processId" column="process_id"/>
+            <result property="name" column="name"/>
+            <result property="subName" column="sub_name" />
+            <result property="subBeforeDay" column="sub_before_day" />
+            <result property="subCompleteBeforeDay" column="sub_complete_before_day" />
+            <result property="type" column="type"/>
+            <result property="companyName" column="company_name"/>
+            <result property="bondCode" column="bond_code"/>
+            <result property="bondShortname" column="bond_shortname"/>
+            <result property="shortname" column="shortname"/>
+            <result property="description" column="description"/>
+            <result property="color" column="color"/>
+            <result property="content" column="content"/>
+            <result property="rightLineContent" column="right_line_content"/>
+            <result property="confirm" column="confirm"/>
+            <result property="mailUser" column="mail_user"/>
+            <result property="mailBeforeDay" column="mail_before_day"/>
+            <result property="mailFrequency" column="mail_frequency"/>
+            <result property="autoRelate" column="auto_relate" />
+            <result property="noticeFlag" column="notice_flag"/>
+            <result property="status" column="status"/>
+            <result property="reason" column="reason"/>
+            <result property="mark" column="mark"/>
+            <result property="remindDate" column="remind_date"/>
+            <result property="completeDate" column="complete_date"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <collection property="processTemplateAttachmentList" ofType="ProcessTemplateAttachment">
+                <id property="id" column="template_attachment_id"/>
+
+                <result property="type" column="template_attachment_type"/>
+                <result property="name" column="template_attachment_name"/>
+                <result property="url" column="template_attachment_url"/>
+                <result property="description" column="template_attachment_description"/>
+                <result property="createTime" column="template_attachment_create_time"/>
+            </collection>
+            <collection property="processAttachmentList" ofType="ProcessAttachment">
+                <id property="id" column="attachment_id"/>
+
+                <result property="type" column="attachment_type"/>
+                <result property="name" column="attachment_name"/>
+                <result property="url" column="attachment_url"/>
+                <result property="description" column="attachment_description"/>
+                <result property="createTime" column="attachment_create_time"/>
+            </collection>
+        </association>
+    </resultMap>
+
+    <select id="findByProcessId" resultMap="matterTaskResultMap">
+        SELECT a.*,
+        b.id as template_attachment_id,
+        b.type as template_attachment_type,
+        b.name as template_attachment_name,
+        b.url as template_attachment_url,
+        b.description as template_attachment_description,
+        b.create_time as template_attachment_create_time,
+        c.id as attachment_id,
+        c.type as attachment_type,
+        c.name as attachment_name,
+        c.url as attachment_url,
+        c.description as attachment_description,
+        c.create_time as attachment_create_time
+        FROM `bpms_process_info` a
+        LEFT JOIN `bpms_process_template_attachment` b ON a.process_id = b.process_id
+        LEFT JOIN `bpms_process_attachment` c ON a.process_id = c.process_id
+        WHERE a.process_id=#{pId}
+    </select>
+
+    <select id="findRightLineByProcessId" resultMap="matterTaskResultMap">
+        SELECT art.ID_,a.*,
+        h.order_index,
+        b.id as template_attachment_id,
+        b.type as template_attachment_type,
+        b.name as template_attachment_name,
+        b.url as template_attachment_url,
+        b.description as template_attachment_description,
+        b.create_time as template_attachment_create_time,
+        c.id as attachment_id,
+        c.type as attachment_type,
+        c.name as attachment_name,
+        c.url as attachment_url,
+        c.description as attachment_description,
+        c.create_time as attachment_create_time
+        FROM `bpms_process_info` a
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON a.`process_id`= h.`process_id`
+        LEFT JOIN `activiti_process`.ACT_RU_TASK art
+        ON a.`process_id` = art.`PROC_INST_ID_`
+        LEFT JOIN `bpms_process_template_attachment` b ON a.process_id = b.process_id
+        LEFT JOIN `bpms_process_attachment` c ON a.process_id = c.process_id
+        INNER JOIN (SELECT custom_id,DATE_FORMAT(create_time,'%y-%m-%d') AS create_time
+        FROM bpms_survive_process WHERE process_id=#{pId}) AS tmp
+        ON h.custom_id = tmp.custom_id AND DATE_FORMAT(h.create_time,'%y-%m-%d')=tmp.create_time
+        WHERE  h.status not in(2,4)
+        order by h.order_index ASC
+    </select>
+
+    <select id="findInspectorCompany" parameterType="ReqData" resultType="Company">
+        SELECT `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name AS `name`,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE 1=1
+        <include refid="condition"/>
+        )AS tmp
+        GROUP BY `name`
+        ORDER BY date_order DESC
+    </select>
+
+    <select id="findInspectorTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT  a.ID_,b.*,h.order_index,
+        attr.id as attachment_id,
+        attr.type as attachment_type,
+        attr.name as attachment_name,
+        attr.url as attachment_url,
+        attr.description as attachment_description,
+        attr.create_time as attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_attachment` attr
+         ON b.process_id = attr.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+         WHERE
+        b.company_name=#{companyName}
+        AND ((b.status=1 and h.order_index IN(0,1)) or b.status!=1)
+        <include refid="condition"/>
+        ORDER BY b.type DESC,b.bond_code,b.remind_date DESC
+    </select>
+    <select id="findManagerCompany" parameterType="ReqData" resultType="Company">
+       SELECT company_name AS `name`,MAX(remind_date) AS date_order FROM (
+       SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=1 AND b.status IN(2,4,8,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        UNION ALL
+        SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=0 AND b.status IN(2,4,8,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ) as tmp
+        GROUP BY company_name
+        ORDER BY date_order DESC
+    </select>
+    <select id="findManagerTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS template_attachment_id,
+        attr.type AS template_attachment_type,
+        attr.name AS template_attachment_name,
+        attr.url AS template_attachment_url,
+        attr.description AS template_attachment_description,
+        attr.create_time AS template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN `bpms_process_template_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=1 AND b.status IN(2,4,8,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.bond_code,b.remind_date DESC)as tmp1
+        UNION ALL
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS template_attachment_id,
+        attr.type AS template_attachment_type,
+        attr.name AS template_attachment_name,
+        attr.url AS template_attachment_url,
+        attr.description AS template_attachment_description,
+        attr.create_time AS template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+	    INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN `bpms_process_template_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=0 AND b.status IN(2,4,8,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.remind_date DESC)as tmp2
+    </select>
+
+    <select id="findInspectorOverTaskProcessIds" parameterType="ReqData" resultType="string">
+        SELECT  b.process_id
+        from
+        bpms.`bpms_process_info` b
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE
+        b.status=32
+        <include refid="condition"/>
+        ORDER BY b.update_time DESC
+    </select>
+    <select id="findInspectorOverTasks"  resultMap="matterTaskResultMap">
+        SELECT  b.*,h.order_index,
+        c.id as attachment_id,
+        c.type as attachment_type,
+        c.name as attachment_name,
+        c.url as attachment_url,
+        c.description as attachment_description,
+        c.create_time as attachment_create_time
+        from
+        bpms.`bpms_process_info` b
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_attachment` c
+        ON b.process_id = c.process_id
+        WHERE
+        b.process_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY b.update_time DESC
+    </select>
+    <select id="findManagerOverTaskProcessIds" parameterType="ReqData" resultType="string">
+        SELECT  DISTINCT b.process_id
+        from
+        bpms.`bpms_process_info` b
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.status=32 and g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.update_time DESC
+    </select>
+    <select id="findManagerOverTasks"  resultMap="matterTaskResultMap">
+        SELECT  b.*,h.order_index,
+        c.id as attachment_id,
+        c.type as attachment_type,
+        c.name as attachment_name,
+        c.url as attachment_url,
+        c.description as attachment_description,
+        c.create_time as attachment_create_time
+        from
+        bpms.`bpms_process_info` b
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_attachment` c
+        ON b.process_id = c.process_id
+        WHERE
+        b.process_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY b.update_time DESC
+    </select>
+
+    <select id="findConfirmCompany" parameterType="ReqData" resultType="Company">
+        SELECT `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name AS `name`,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        WHERE b.status=1
+        <include refid="condition"/>
+        )AS tmp
+        GROUP BY `name`
+        ORDER BY date_order DESC
+    </select>
+    <select id="findConfirmTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT  a.ID_,b.*,
+        h.order_index,
+        att.id as template_attachment_id,
+        att.type as template_attachment_type,
+        att.name as template_attachment_name,
+        att.url as template_attachment_url,
+        att.description as template_attachment_description,
+        att.create_time as template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_template_attachment` att
+        ON b.process_id = att.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE b.status=1 AND h.order_index IN(0,1) AND
+        b.company_name=#{companyName}
+        <include refid="condition"/>
+        ORDER BY b.type DESC,b.bond_code,b.remind_date DESC
+    </select>
+
+    <select id="findCheckCompany" parameterType="ReqData" resultType="Company">
+        SELECT `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name AS `name`,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE b.status in (4,16)
+        <include refid="condition"/>
+        )AS tmp
+        GROUP BY `name`
+        ORDER BY date_order DESC
+    </select>
+    <select id="findCheckTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT  a.ID_,b.*,
+        h.order_index,
+        att.id as attachment_id,
+        att.type as attachment_type,
+        att.name as attachment_name,
+        att.url as attachment_url,
+        att.description as attachment_description,
+        att.create_time as attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_attachment` att
+        ON b.process_id = att.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE  b.status in (4,16) AND
+        b.company_name=#{companyName}
+        <include refid="condition"/>
+        ORDER BY b.type DESC,b.bond_code,b.remind_date DESC
+    </select>
+
+
+    <select id="findInspectorTraceCompany" parameterType="ReqData" resultType="Company">
+        SELECT `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name AS `name`,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE b.status in (2,8)
+        <include refid="condition"/>
+        )AS tmp
+        GROUP BY `name`
+        ORDER BY date_order DESC
+    </select>
+    <select id="findInspectorTraceTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT  a.ID_,b.*,
+        h.order_index,
+        attr.id as template_attachment_id,
+        attr.type as template_attachment_type,
+        attr.name as template_attachment_name,
+        attr.url as template_attachment_url,
+        attr.description as template_attachment_description,
+        attr.create_time as template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        LEFT JOIN `bpms_process_template_attachment` attr
+        ON b.process_id = attr.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        LEFT JOIN bpms_bond_manager g ON c.code=g.bond_code
+        WHERE  b.status in (2,8) AND
+        b.company_name=#{companyName}
+        <include refid="condition"/>
+        ORDER BY b.type DESC,b.bond_code,b.remind_date DESC
+    </select>
+
+    <select id="findHandleCompany" parameterType="ReqData" resultType="Company">
+        SELECT company_name AS `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=1 AND b.status IN(2,8) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        UNION ALL
+        SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=0 AND b.status IN(2,8) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ) as tmp
+        GROUP BY company_name
+        ORDER BY date_order DESC
+    </select>
+    <select id="findHandleTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS template_attachment_id,
+        attr.type AS template_attachment_type,
+        attr.name AS template_attachment_name,
+        attr.url AS template_attachment_url,
+        attr.description AS template_attachment_description,
+        attr.create_time AS template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN `bpms_process_template_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=1 AND b.status IN(2,8) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.bond_code,b.remind_date DESC)as tmp1
+        UNION ALL
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS template_attachment_id,
+        attr.type AS template_attachment_type,
+        attr.name AS template_attachment_name,
+        attr.url AS template_attachment_url,
+        attr.description AS template_attachment_description,
+        attr.create_time AS template_attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN `bpms_process_template_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=0 AND b.status IN(2,8) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.remind_date DESC)as tmp2
+    </select>
+
+    <select id="findManagerTraceCompany" parameterType="ReqData" resultType="Company">
+        SELECT company_name AS `name`,MAX(remind_date) AS date_order FROM (
+        SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=1 AND b.status IN(4,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        UNION ALL
+        SELECT b.company_name,b.remind_date FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE b.type=0 AND b.status IN(4,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ) as tmp
+        GROUP BY company_name
+        ORDER BY date_order DESC
+    </select>
+    <select id="findManagerTraceTasks" parameterType="ReqData" resultMap="matterTaskResultMap">
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS attachment_id,
+        attr.type AS attachment_type,
+        attr.name AS attachment_name,
+        attr.url AS attachment_url,
+        attr.description AS attachment_description,
+        attr.create_time AS attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        INNER JOIN bpms_bond_manager g
+        ON b.bond_code=g.bond_code
+        LEFT JOIN `bpms_process_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_bond c
+        ON c.code=b.`bond_code`
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=1 AND b.status IN(4,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.bond_code,b.remind_date DESC)as tmp1
+        UNION ALL
+        SELECT * FROM (SELECT  a.ID_,b.*,h.order_index,
+        attr.id AS attachment_id,
+        attr.type AS attachment_type,
+        attr.name AS attachment_name,
+        attr.url AS attachment_url,
+        attr.description AS attachment_description,
+        attr.create_time AS attachment_create_time
+        FROM `activiti_process`.ACT_RU_TASK a
+        INNER JOIN bpms.`bpms_process_info` b
+        ON a.`PROC_INST_ID_`=b.`process_id`
+        INNER JOIN bpms.`bpms_survive_process` h
+        ON b.`process_id`= h.`process_id`
+        INNER JOIN bpms_bond c
+        ON b.company_name=c.company_name
+        INNER JOIN bpms_bond_manager g
+        ON c.code=g.bond_code
+        LEFT JOIN `bpms_process_attachment` attr
+        ON attr.process_id = b.process_id
+        LEFT JOIN bpms_company d
+        ON d.name=b.`company_name`
+        LEFT JOIN bpms_area e
+        ON d.`city_code`=e.`code`
+        LEFT JOIN bpms_area f
+        ON d.`province_code`=f.`code`
+        WHERE
+        b.company_name=#{companyName} AND b.type=0 AND b.status IN(4,16) AND g.user_id=#{userId}
+        <include refid="condition"/>
+        ORDER BY b.remind_date DESC)as tmp2
+    </select>
+
+    <sql id="condition">
+        <if test="type !=null and type !='' ">
+             AND b.`type`=#{type}
+        </if>
+        <if test="completeDate !=null and completeDate !='' ">
+            AND b.`complete_date`=#{completeDate}
+        </if>
+        <if test="listedPlace !=null and listedPlace !='' ">
+            AND c.`listed_place`=#{listedPlace}
+        </if>
+        <if test="bondType !=null and bondType !='' ">
+            AND c.`type`=#{bondType}
+        </if>
+        <if test="province !=null and province !='' ">
+            AND f.`code`=#{province}
+        </if>
+        <if test="city !=null and city !='' ">
+            AND e.`code`=#{city}
+        </if>
+        <if test="valueDateBegin !=null and valueDateBegin !='' ">
+            AND DATE_FORMAT(c.value_date,'%Y-%m-%d') &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd !=null and valueDateEnd !='' ">
+            AND DATE_FORMAT(c.value_date,'%Y-%m-%d') &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin !=null and payDayBegin !='' ">
+            AND DATE_FORMAT(c.pay_day,'%Y')&gt;=  #{payDayBegin}
+        </if>
+        <if test="payDayEnd !=null and payDayEnd !='' ">
+            AND DATE_FORMAT(c.pay_day,'%Y')&lt;=  #{payDayEnd}
+        </if>
+        <if test="timeLimitBegin !=null and timeLimitBegin !='' ">
+            AND c.`time_limit` &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd !=null and timeLimitEnd !='' ">
+            AND c.`time_limit` &lt;= #{timeLimitEnd}
+        </if>
+        <if test="user !=null and user !='' ">
+            AND g.`user_id`=#{user}
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(c.guarantee_company_1,'')='' OR c.guarantee_company_1='无' OR IFNULL(c.guarantee_company_2,'')='' OR c.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany != "无" '>
+            AND (c.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR c.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="bondManagerType == 1 ">
+            AND c.bond_manager LIKE '%天风%'
+        </if>
+        <if test="bondManagerType == 2 ">
+            AND c.bond_manager NOT LIKE '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !='' ">
+            AND c.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        <if test="matterName !=null and matterName !='' ">
+            AND b.name LIKE '%' #{matterName} '%'
+        </if>
+        <if test="common !=null and common !='' ">
+            AND (b.company_name like '%' #{common} '%'
+            OR b.bond_shortname like '%' #{common} '%'
+            OR b.bond_code like '%' #{common} '%')
+        </if>
+    </sql>
+</mapper>

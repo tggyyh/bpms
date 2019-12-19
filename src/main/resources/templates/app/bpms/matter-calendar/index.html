@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <div th:replace="shared/sharedcss"></div>
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <script th:src="@{/js/app/bpms/matter-calendar/index.js}"></script>
+</head>
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-content">
+
+                    <div class="col-sm-12">
+                        <table id="tabDate" class="calendar-table">
+                            <tr>
+                                <td>周一</td>
+                                <td>周二</td>
+                                <td>周三</td>
+                                <td>周四</td>
+                                <td>周五</td>
+                                <td>周六</td>
+                                <td>周日</td>
+                                <td rowspan="7">
+                                    <div style="width:100%;height:100%;">
+                                        <div class="col-sm-12" style="float:left;font-size:18px;margin-top:-80px;">
+                                            <div id="divPrev" class="col-sm-2 glyphicon glyphicon-menu-left" style="cursor:pointer;"></div>
+                                            <div id="divDate" class="col-sm-8 text-center"></div>
+                                            <div id="hidMonthDate" class="hide"></div>
+                                            <div id="divNext" class="col-sm-2 glyphicon glyphicon-menu-right" style="cursor:pointer;"></div>
+                                        </div>
+                                        <div id="divDay" class="col-sm-6 text-right" style="font-size:80px;color:#009933;font-weight:200;"></div>
+                                        <div id="divWeek" class="col-sm-6" style="padding:60px 0 0 20px"></div>
+                                        <div id="divToday" class="col-sm-12 text-center">今日</div>
+                                        <div id="divSelectDate" class="hide"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-12 label-top-5">
+                        <div class="tabs-container font-color-black">
+                            <ul id="calendar" class="nav nav-tabs layer-tabs">
+                                <li class="active">
+                                    <a id="tab-complete" data-toggle="tab" href="#tab-infoComplete" aria-expanded="true">需完成事项</a>
+                                </li>
+                                <li class="">
+                                    <a id="tab-remind" data-toggle="tab" href="#tab-infoRemind" aria-expanded="false">等待触发事项</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div id="tab-infoComplete" class="tab-pane active">
+                                    <div id="divInfoComplete" class="panel-body">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-2 label-top-5 text-left">事项类型：</label>
+                                            <div class="col-sm-3">
+                                                <select id="drop_search_complete_type" class="form-control" tabindex="2">
+                                                    <option value="" selected="selected">全部事项</option>
+                                                    <option value="0">发行人事项</option>
+                                                    <option value="1">项目事项</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-sm-2 label-top-5 text-left">事项状态：</label>
+                                            <div class="col-sm-3">
+                                                <select id="drop_search_complete_status" class="form-control" tabindex="2">
+                                                    <option value="0" selected="selected">全部事项</option>
+                                                    <option value="1">未触发</option>
+                                                    <option value="2">等待督导人员确认</option>
+                                                    <option value="3">等待项目人员处理</option>
+                                                    <option value="4">等待督导人员审核</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12"><br/></div>
+                                        <div class="col-sm-12">
+                                            <table id="tabComplete" style="width:100%;table-layout:fixed;">
+                                                <thead>
+                                                    <tr>
+                                                        <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">事项名称</td>
+                                                        <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">发行人/项目名</td>
+                                                        <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">触发时间/需完成时间</td>
+                                                        <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">事项当前所处状态</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="completePagePagination"></div>
+                                    </div>
+                                </div>
+                                <div id="tab-infoRemind" class="tab-pane">
+                                    <div id="divInfoRemind" class="panel-body">
+                                        <div class="col-sm-12">
+                                            <label class="col-sm-1 label-top-5 text-left">事项类型：</label>
+                                            <div class="col-sm-3">
+                                                <select id="drop_search_remind_type" class="form-control" tabindex="2">
+                                                    <option value="" selected="selected">全部事项</option>
+                                                    <option value="0">发行人事项</option>
+                                                    <option value="1">项目事项</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-sm-2 label-top-5 text-left">事项状态：</label>
+                                            <div class="col-sm-4">
+                                                <select id="drop_search_remind_status" class="form-control" tabindex="2">
+                                                    <option value="" selected="selected">全部事项</option>
+                                                    <option value="1">等待督导人员确认</option>
+                                                    <option value="0">等待项目人员处理</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12"><br/></div>
+                                        <div class="col-sm-12">
+                                            <table id="tabRemind" style="width:100%;table-layout:fixed;">
+                                                <thead>
+                                                <tr>
+                                                    <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">事项名称</td>
+                                                    <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">发行人/项目名</td>
+                                                    <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">触发时间/需完成时间</td>
+                                                    <td style="background:#E4E4E4;padding:5px 5px 5px 20px;">事项将处状态</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="remindPagePagination"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+
+

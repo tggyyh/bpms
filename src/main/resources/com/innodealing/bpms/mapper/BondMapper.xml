@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.BondMapper">
+
+    <resultMap id="bondResultMap" type="Bond">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="shortname" column="shortname"/>
+        <result property="type" column="type"/>
+        <result property="companyName" column="company_name"/>
+        <result property="rateType" column="rate_type"/>
+        <result property="currentBalance" column="current_balance"/>
+        <result property="bondManager" column="bond_manager"/>
+        <result property="interestPayMode" column="interest_pay_mode"/>
+        <result property="repayMode" column="repay_mode"/>
+        <result property="payFrequency" column="pay_frequency"/>
+        <result property="timeLimit" column="time_limit"/>
+        <result property="specialTimeLimit" column="special_time_limit"/>
+        <result property="valueDate" column="value_date"/>
+        <result property="payDay" column="pay_day"/>
+        <result property="optionType" column="option_type"/>
+        <result property="exerciseSchedule" column="exercise_schedule"/>
+        <result property="currentPeriodAmount" column="current_period_amount"/>
+        <result property="rate" column="rate"/>
+        <result property="rateHigh" column="rate_high"/>
+        <result property="rateLow" column="rate_low"/>
+        <result property="specialTerm" column="special_term"/>
+        <result property="specailTermType" column="specail_term_type"/>
+        <result property="documentAmount" column="document_amount"/>
+        <result property="stockExchangePrice" column="stock_exchange_price"/>
+        <result property="stockExchangeRatio" column="stock_exchange_ratio"/>
+        <result property="stockExchangeBegin" column="stock_exchange_begin"/>
+        <result property="stockExchangeEnd" column="stock_exchange_end"/>
+        <result property="ransomTerm" column="ransom_term"/>
+        <result property="backSaleTerm" column="back_sale_term"/>
+        <result property="exchangeStockTerm" column="exchange_stock_term"/>
+
+        <result property="writeDownTerm" column="write_down_term"/>
+        <result property="bidStockCode" column="bid_stock_code"/>
+        <result property="listedPlace" column="listed_place"/>
+        <result property="crossMarket" column="cross_market"/>
+        <result property="scale" column="scale"/>
+        <result property="price" column="price"/>
+        <result property="publishType" column="publish_type"/>
+        <result property="fixPriceType" column="fix_price_type"/>
+        <result property="underwriterName" column="underwriter_name"/>
+        <result property="viceUnderwriterName" column="vice_underwriter_name"/>
+        <result property="underwritingMode" column="underwriting_mode"/>
+        <result property="bondRatingCompany1" column="bond_rating_company_1"/>
+        <result property="rating1" column="rating_1"/>
+        <result property="bondRatingCompany2" column="bond_rating_company_2"/>
+        <result property="bondRatingOrgCode2" column="bond_rating_org_code_2"/>
+        <result property="rating2" column="rating_2"/>
+        <result property="guaranteeCompany1" column="guarantee_company_1"/>
+        <result property="guaranteeMode1" column="guarantee_mode_1"/>
+        <result property="guaranteeCompany2" column="guarantee_company_2"/>
+        <result property="guaranteeOrgCode2" column="guarantee_org_code_2"/>
+        <result property="guaranteeMode2" column="guarantee_mode_2"/>
+        <result property="creditMode" column="credit_mode"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+        <result property="matterId" column="matterId"/>
+        <result property="listedDate" column="listed_date"/>
+
+        <collection property="company" ofType="Company">
+            <id property="id" column="comp_id"/>
+            <result property="name" column="comp_name"/>
+            <result property="shortname" column="comp_shortname"/>
+            <result property="industryScale" column="comp_industryScale"/>
+            <result property="economicSector" column="comp_economicSector"/>
+            <result property="industryType" column="comp_industryType"/>
+            <result property="industryBigType" column="comp_industryBigType"/>
+            <result property="economicDepartment" column="comp_economicDepartment"/>
+            <result property="economicDepartmentDetail" column="comp_economicDepartmentDetail"/>
+            <result property="industryTypeName" column="comp_industryTypeName"/>
+            <result property="industryBigTypeName" column="comp_industryBigTypeName"/>
+            <result property="economicDepartmentName" column="comp_economicDepartmentName"/>
+            <result property="economicDepartmentDetailName" column="comp_economicDepartmentDetailName"/>
+            <result property="stockCode" column="comp_stockCode"/>
+            <result property="ratingCompany1" column="comp_ratingCompany1"/>
+            <result property="corporateRating1" column="comp_corporateRating1"/>
+            <result property="ratingCompany2" column="comp_ratingCompany2"/>
+            <result property="corporateRating2" column="comp_corporateRating2"/>
+            <result property="corporateOrgCode2" column="comp_corporateOrgCode2"/>
+            <result property="provinceCode" column="comp_provinceCode"/>
+            <result property="cityCode" column="comp_cityCode"/>
+            <result property="status" column="comp_status"/>
+            <result property="provinceName" column="comp_provinceName"/>
+            <result property="cityName" column="comp_cityName"/>
+            <result property="companyCount" column="company_count"/>
+
+            <collection property="companyLinkmanList" ofType="CompanyLinkman">
+                <id property="id" column="companyLinkman_id"/>
+                <result property="companyName" column="companyLinkman_company_name"/>
+                <result property="name" column="companyLinkman_name"/>
+                <result property="phone" column="companyLinkman_phone"/>
+                <result property="mobile" column="companyLinkman_mobile"/>
+                <result property="mail" column="companyLinkman_mail"/>
+                <result property="createTime" column="companyLinkman_create_time"/>
+            </collection>
+        </collection>
+
+        <collection property="bondManagerList" ofType="BondManager">
+            <id property="id" column="manager_id"/>
+            <result property="bondCode" column="manager_bond_code"/>
+            <result property="userId" column="manager_user_id"/>
+            <result property="createTime" column="manager_create_time"/>
+            <collection property="sysUser" ofType="User">
+                <id property="id" column="sysuser_id"/>
+                <result property="name" column="sysuser_name"/>
+                <result property="accountNumber" column="sysuser_account_number"/>
+                <result property="email" column="sysuser_email"/>
+                <result property="phone" column="sysuser_phone"/>
+                <result property="createTime" column="sysuser_create_time"/>
+            </collection>
+        </collection>
+
+        <collection property="bankManagerList" ofType="BankManager">
+            <id property="id" column="bankManager_id"/>
+            <result property="bondCode" column="bankManager_bond_code"/>
+            <result property="name" column="bankManager_name"/>
+            <result property="email" column="bankManager_email"/>
+            <result property="phone" column="bankManager_phone"/>
+            <result property="mobile" column="bankManager_mobile"/>
+            <result property="createTime" column="bankManager_create_time"/>
+        </collection>
+
+
+    </resultMap>
+
+    <select id="findById" resultType="Bond">
+        SELECT * FROM bpms_bond WHERE id=#{id}
+    </select>
+
+    <select id="isExist" resultType="int" parameterType="Bond">
+        SELECT COUNT(id) tempCount FROM bpms_bond WHERE id!=#{id} AND `status`!=4 AND `code`=#{code}
+    </select>
+
+    <select id="findAllBond" resultType="Bond">
+        SELECT * FROM bpms_bond WHERE status!=4
+    </select>
+
+    <select id="findAll" resultMap="bondResultMap">
+        SELECT DISTINCT t1.*,
+        t2.id comp_id,t2.`name` comp_name,t2.shortname comp_shortname,
+        t2.industry_scale comp_industryScale,t2.economic_sector comp_economicSector,t2.industry_type comp_industryType,
+        t2.industry_big_type comp_industryBigType,t2.economic_department comp_economicDepartment,t2.economic_department_detail comp_economicDepartmentDetail,
+        t2.stock_code comp_stockCode,t2.rating_company_1 comp_ratingCompany1,t2.corporate_rating_1 comp_corporateRating1,
+        t2.rating_company_2 comp_ratingCompany2,t2.corporate_rating_2 comp_corporateRating2,t2.corporate_org_code_2 comp_corporateOrgCode2,
+        t2.province_code comp_provinceCode,t2.city_code comp_cityCode,t2.status comp_status,
+        tp.`name` comp_provinceName,tc.`name` comp_cityName
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT tbm1.*
+            FROM bpms_bond_manager tbm1 JOIN (
+            SELECT DISTINCT bond_code FROM bpms_bond_manager WHERE user_id=#{manageruser}
+            ) tbm2 ON tbm1.bond_code=tbm2.bond_code
+            ) t3 ON t1.code=t3.bond_code
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+            LEFT JOIN bpms_bond_manager t3 ON t1.code=t3.bond_code
+        </if>
+        LEFT JOIN bpms_area tp ON t2.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t2.city_code=tc.`code`
+        WHERE t1.status!=4
+        <if test="id != null and id != ''">
+            AND t1.id=#{id}
+        </if>
+        <if test="bondname != null and bondname != ''">
+            AND (t1.code LIKE '%' #{bondname} '%' OR t1.shortname LIKE '%' #{bondname} '%' OR t1.company_name LIKE '%' #{bondname} '%')
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t2.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t2.city_code =#{cityCode}
+        </if>
+        <if test="listedPlace != null and listedPlace.size()>0">
+            AND (
+            <foreach item="placeItem" collection="listedPlace" open="(" separator="OR" close=")">
+                find_in_set(#{placeItem}, REPLACE(listed_place,';',','))
+            </foreach>
+            )
+        </if>
+        <if test="type != null and type.size()>0">
+            AND (
+            <foreach item="typeItem" collection="type" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, type)
+            </foreach>
+            )
+        </if>
+        <if test="userId != null and userId.size()>0">
+            AND (
+            <foreach item="userIdItem" collection="userId" open="(" separator="OR" close=")">
+                find_in_set(#{userIdItem}, t3.user_id)
+            </foreach>
+            )
+        </if>
+        <if test="timeLimitBegin != null and timeLimitBegin != ''">
+            AND t1.time_Limit &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd != null and timeLimitEnd != ''">
+            AND t1.time_Limit &lt;= #{timeLimitEnd}
+        </if>
+        <if test="valueDateBegin != null and valueDateBegin != ''">
+            AND t1.value_date &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd != null and valueDateEnd != ''">
+            AND t1.value_date &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin != null and payDayBegin != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &gt;= #{payDayBegin}
+        </if>
+        <if test="payDayEnd != null and payDayEnd != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &lt;= #{payDayEnd}
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(t1.guarantee_company_1,'')='' OR t1.guarantee_company_1='无' OR IFNULL(t1.guarantee_company_2,'')='' OR t1.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany !="无"'>
+            AND (t1.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR t1.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t1.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t1.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !=''">
+            AND t1.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        ORDER BY t1.status,t1.create_time DESC
+    </select>
+
+    <select id="findByBondId" resultMap="bondResultMap">
+        SELECT
+        t1.*,
+        t2.id comp_id,t2.`name` comp_name,t2.shortname comp_shortname,
+        t2.industry_scale comp_industryScale,t2.economic_sector comp_economicSector,t2.industry_type comp_industryType,
+        t2.industry_big_type comp_industryBigType,t2.economic_department comp_economicDepartment,t2.economic_department_detail comp_economicDepartmentDetail,
+        t2.stock_code comp_stockCode,t2.rating_company_1 comp_ratingCompany1,t2.corporate_rating_1 comp_corporateRating1,
+        t2.rating_company_2 comp_ratingCompany2,t2.corporate_rating_2 comp_corporateRating2,t2.corporate_org_code_2 comp_corporateOrgCode2,
+        t2.province_code comp_provinceCode,t2.city_code comp_cityCode,t2.status comp_status,
+        tp.`name` comp_provinceName,tc.`name` comp_cityName,
+        t5.name comp_industryTypeName,t6.name comp_industryBigTypeName,
+        t7.name comp_economicDepartmentName,t8.name comp_economicDepartmentDetailName
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN bpms_area tp ON t2.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t2.city_code=tc.`code`
+        LEFT JOIN bpms_industry t5 ON t2.industry_type=t5.code
+        LEFT JOIN bpms_industry t6 ON t2.industry_big_type=t6.code
+        LEFT JOIN bpms_economic_department t7 ON t2.economic_department=t7.code
+        LEFT JOIN bpms_economic_department t8 ON t2.economic_department_detail=t8.code
+        WHERE t1.status!=4 AND t1.id=#{id}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findByCompanyId" resultMap="bondResultMap">
+        SELECT
+            t1.*,
+            t2.id comp_id,t2.`name` comp_name,t2.shortname comp_shortname,
+            t2.industry_scale comp_industryScale,t2.economic_sector comp_economicSector,t2.industry_type comp_industryType,
+            t2.industry_big_type comp_industryBigType,t2.economic_department comp_economicDepartment,t2.economic_department_detail comp_economicDepartmentDetail,
+            t2.stock_code comp_stockCode,t2.rating_company_1 comp_ratingCompany1,t2.corporate_rating_1 comp_corporateRating1,
+            t2.rating_company_2 comp_ratingCompany2,t2.corporate_rating_2 comp_corporateRating2,t2.corporate_org_code_2 comp_corporateOrgCode2,
+            t2.province_code comp_provinceCode,t2.city_code comp_cityCode,t2.status comp_status,
+            t3.id manager_id,t3.bond_code manager_bond_code,t3.user_id manager_user_id,t3.create_time manager_create_time,
+            t4.id sysuser_id,t4.`name` sysuser_name,t4.email sysuser_email,t4.phone sysuser_phone,t4.create_time sysuser_create_time
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN bpms_bond_manager t3 ON t1.`code`=t3.bond_code
+        LEFT JOIN sys_user t4 ON t3.user_id=t4.id
+        WHERE t1.status!=4 AND t2.id=#{companyId}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findByBondCode" resultMap="bondResultMap">
+        SELECT
+            t1.*,
+            t3.id manager_id,t3.bond_code manager_bond_code,t3.user_id manager_user_id,t3.create_time manager_create_time,
+            t4.id sysuser_id,t4.`name` sysuser_name,t4.email sysuser_email,t4.phone sysuser_phone,t4.create_time sysuser_create_time
+        FROM bpms_bond t1
+        LEFT JOIN bpms_bond_manager t3 ON t1.`code`=t3.bond_code
+        LEFT JOIN sys_user t4 ON t3.user_id=t4.id
+        WHERE t1.status!=4 AND t1.code=#{bondCode}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findBondByCode" resultType="Bond">
+        SELECT * FROM bpms_bond WHERE status!=4 AND code=#{bondCode}
+    </select>
+
+    <select id="findBondManagerByCode" resultMap="bondResultMap">
+        SELECT
+            t1.*,
+            t3.id manager_id,t3.bond_code manager_bond_code,t3.user_id manager_user_id,t3.create_time manager_create_time,
+            t4.id sysuser_id,t4.`name` sysuser_name,t4.email sysuser_email,t4.phone sysuser_phone,t4.create_time sysuser_create_time
+        FROM bpms_bond t1
+        LEFT JOIN bpms_bond_manager t3 ON t1.`code`=t3.bond_code
+        LEFT JOIN sys_user t4 ON t3.user_id=t4.id
+        WHERE t1.code=#{bondCode} AND t1.status!=4
+    </select>
+
+    <select id="findOtherBond" resultMap="bondResultMap">
+        SELECT
+        t1.*,t3.id manager_id,t3.bond_code manager_bond_code,t3.user_id manager_user_id,t3.create_time manager_create_time,
+        t4.id sysuser_id,t4.`name` sysuser_name,t4.email sysuser_email,t4.phone sysuser_phone,t4.create_time sysuser_create_time
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN bpms_bond_manager t3 ON t1.`code`=t3.bond_code
+        LEFT JOIN sys_user t4 ON t3.user_id=t4.id
+        WHERE t1.status!=4 AND t1.company_name=#{companyName} AND t1.code!=#{bondCode}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <delete id="deleteByIds" parameterType="int[]">
+        DELETE FROM bpms_bond WHERE id IN
+        <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+
+    <insert id="insertBond" useGeneratedKeys="true" keyProperty="id" parameterType="Bond">
+        INSERT INTO bpms_bond (
+            code,name,shortname,type,company_name,rate_type,current_balance,bond_manager,interest_pay_mode,repay_mode,
+            pay_frequency,time_limit,special_time_limit,value_date,pay_day,option_type,exercise_schedule,
+            current_period_amount,rate,rate_high,rate_low,special_term,specail_term_type,document_amount,stock_exchange_price,
+            stock_exchange_ratio,stock_exchange_begin,stock_exchange_end,ransom_term,back_sale_term,exchange_stock_term,
+            write_down_term,bid_stock_code,listed_place,cross_market,scale,price,publish_type,
+            fix_price_type,underwriter_name,vice_underwriter_name,underwriting_mode,bond_rating_company_1,rating_1,
+            bond_rating_company_2,bond_rating_org_code_2,rating_2,guarantee_company_1,guarantee_mode_1,
+            guarantee_company_2,guarantee_org_code_2,guarantee_mode_2,credit_mode,create_time,update_time,status,listed_date
+        ) VALUES (
+            #{code},#{name},#{shortname},#{type},#{companyName},#{rateType},#{currentBalance},#{bondManager},#{interestPayMode},#{repayMode},
+            #{payFrequency},#{timeLimit},#{specialTimeLimit},#{valueDate},#{payDay},#{optionType},#{exerciseSchedule},
+            #{currentPeriodAmount},#{rate},#{rateHigh},#{rateLow},#{specialTerm},#{specailTermType},#{documentAmount},#{stockExchangePrice},
+            #{stockExchangeRatio},#{stockExchangeBegin},#{stockExchangeEnd},#{ransomTerm},#{backSaleTerm},#{exchangeStockTerm},
+            #{writeDownTerm},#{bidStockCode},#{listedPlace},#{crossMarket},#{scale},#{price},#{publishType},
+            #{fixPriceType},#{underwriterName},#{viceUnderwriterName},#{underwritingMode},#{bondRatingCompany1},#{rating1},
+            #{bondRatingCompany2},#{bondRatingOrgCode2},#{rating2},#{guaranteeCompany1},#{guaranteeMode1},
+            #{guaranteeCompany2},#{guaranteeOrgCode2},#{guaranteeMode2},#{creditMode},NOW(),NOW(),#{status},#{listedDate}
+        )
+    </insert>
+
+    <update id="updateBond" parameterType="Bond">
+        UPDATE bpms_bond SET
+          code=#{code},name=#{name},shortname=#{shortname},type=#{type},company_name=#{companyName},
+          rate_type=#{rateType},current_balance=#{currentBalance},bond_manager=#{bondManager},
+          interest_pay_mode=#{interestPayMode},repay_mode=#{repayMode},pay_frequency=#{payFrequency},
+          time_limit=#{timeLimit},special_time_limit=#{specialTimeLimit},value_date=#{valueDate},
+          pay_day=#{payDay},option_type=#{optionType},exercise_schedule=#{exerciseSchedule},
+          current_period_amount=#{currentPeriodAmount},rate=#{rate},rate_high=#{rateHigh},rate_low=#{rateLow},
+          special_term=#{specialTerm},specail_term_type=#{specailTermType},document_amount=#{documentAmount},
+          stock_exchange_price=#{stockExchangePrice},stock_exchange_ratio=#{stockExchangeRatio},
+          stock_exchange_begin=#{stockExchangeBegin},stock_exchange_end=#{stockExchangeEnd},ransom_term=#{ransomTerm},
+          back_sale_term=#{backSaleTerm},exchange_stock_term=#{exchangeStockTerm},write_down_term=#{writeDownTerm},
+          bid_stock_code=#{bidStockCode},listed_place=#{listedPlace},cross_market=#{crossMarket},
+          scale=#{scale},price=#{price},publish_type=#{publishType},
+          fix_price_type=#{fixPriceType},underwriter_name=#{underwriterName},vice_underwriter_name=#{viceUnderwriterName},
+          underwriting_mode=#{underwritingMode},bond_rating_company_1=#{bondRatingCompany1},rating_1=#{rating1},
+          bond_rating_company_2=#{bondRatingCompany2},bond_rating_org_code_2=#{bondRatingOrgCode2},
+          rating_2=#{rating2},guarantee_company_1=#{guaranteeCompany1},guarantee_mode_1=#{guaranteeMode1},
+          guarantee_company_2=#{guaranteeCompany2},guarantee_org_code_2=#{guaranteeOrgCode2},
+          guarantee_mode_2=#{guaranteeMode2},credit_mode=#{creditMode},update_time=NOW(),status=#{status},listed_date=#{listedDate}
+        WHERE id=#{id}
+    </update>
+
+    <select id="findLinkMatterCount" resultType="Bond">
+        SELECT t1.*,tcm.id matterId
+        FROM bpms_bond t1
+        LEFT JOIN (
+            SELECT * FROM bpms_bond_matter
+            WHERE template_id=#{templateId} AND status=0
+            GROUP BY template_id,bond_code
+        ) tcm ON t1.code=tcm.bond_code
+        WHERE t1.status!=4
+    </select>
+
+    <select id="findLinkMatterPage" resultMap="bondResultMap">
+        SELECT
+        t1.*,tcm.id matterId
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN (
+            SELECT * FROM bpms_bond_matter
+            WHERE template_id=#{templateId} AND status=0
+            GROUP BY template_id,bond_code
+        ) tcm ON t1.code=tcm.bond_code
+        WHERE t1.`status`!=4
+        <if test="null != linkman and linkman != '' and linkman== 0">
+            AND tcm.id IS NOT NULL
+        </if>
+        <if test="null != linkman and linkman != '' and linkman== 1">
+            AND tcm.id IS NULL
+        </if>
+        <if test="bondname != null and bondname != ''">
+            AND (t1.code LIKE '%' #{bondname} '%' OR t1.shortname LIKE '%' #{bondname} '%')
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t2.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t2.city_code =#{cityCode}
+        </if>
+        <if test="listedPlace != null and listedPlace.size()>0">
+            AND (
+            <foreach item="placeItem" collection="listedPlace" open="(" separator="OR" close=")">
+                find_in_set(#{placeItem}, REPLACE(t1.listed_place,';',','))
+            </foreach>
+            )
+        </if>
+        <if test="type != null and type.size()>0">
+            AND (
+            <foreach item="typeItem" collection="type" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, t1.type)
+            </foreach>
+            )
+        </if>
+        <if test="userId != null and userId.size()>0">
+            AND (
+            <foreach item="userIdItem" collection="userId" open="(" separator="OR" close=")">
+                find_in_set(#{userIdItem}, t3.user_id)
+            </foreach>
+            )
+        </if>
+
+        <if test="timeLimitBegin != null and timeLimitBegin != ''">
+            AND t1.time_limit &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd != null and timeLimitEnd != ''">
+            AND t1.time_limit &lt;= #{timeLimitEnd}
+        </if>
+        <if test="valueDateBegin != null and valueDateBegin != ''">
+            AND t1.value_date &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd != null and valueDateEnd != ''">
+            AND t1.value_date &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin != null and payDayBegin != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &gt;= #{payDayBegin}
+        </if>
+        <if test="payDayEnd != null and payDayEnd != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &lt;= #{payDayEnd}
+        </if>
+        <if test="listedDateBegin != null and listedDateBegin != ''">
+            AND t1.listed_date &gt;= #{listedDateBegin}
+        </if>
+        <if test="listedDateEnd != null and listedDateEnd != ''">
+            AND t1.listed_date &lt;= #{listedDateEnd}
+        </if>
+
+        <if test="currentBalanceBegin != null and currentBalanceBegin != ''">
+            AND t1.current_balance &gt;= #{currentBalanceBegin}
+        </if>
+        <if test="currentBalanceEnd != null and currentBalanceEnd != ''">
+            AND t1.current_balance &lt;= #{currentBalanceEnd}
+        </if>
+
+        <if test="crossMarket != null and crossMarket.size()>0">
+            AND (
+            <foreach item="crossMarketItem" collection="crossMarket" open="(" separator="OR" close=")">
+                find_in_set(#{crossMarketItem}, t1.cross_market)
+            </foreach>
+            )
+        </if>
+
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(t1.guarantee_company_1,'')='' OR t1.guarantee_company_1='无' OR IFNULL(t1.guarantee_company_2,'')='' OR t1.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany !="无"'>
+            AND (t1.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR t1.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t1.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t1.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !=''">
+            AND t1.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        <if test="underwriterName != null and underwriterName != ''">
+            AND t1.underwriter_name like '%' #{underwriterName} '%'
+        </if>
+        ORDER BY t1.create_time DESC
+    </select>
+    <select id="findLinkMatterAll" resultMap="bondResultMap">
+        SELECT
+        t1.*,tcm.id matterId,
+        t2.id comp_id,t2.`name` comp_name,t2.shortname comp_shortname,
+        t2.industry_scale comp_industryScale,t2.economic_sector comp_economicSector,t2.industry_type comp_industryType,
+        t2.industry_big_type comp_industryBigType,t2.economic_department comp_economicDepartment,t2.economic_department_detail comp_economicDepartmentDetail,
+        t2.stock_code comp_stockCode,t2.rating_company_1 comp_ratingCompany1,t2.corporate_rating_1 comp_corporateRating1,
+        t2.rating_company_2 comp_ratingCompany2,t2.corporate_rating_2 comp_corporateRating2,t2.corporate_org_code_2 comp_corporateOrgCode2,
+        t2.province_code comp_provinceCode,t2.city_code comp_cityCode,t2.status comp_status,
+        tp.`name` comp_provinceName,tc.`name` comp_cityName,
+        tbm.id manager_id,tbm.bond_code manager_bond_code,tbm.create_time manager_create_time,
+        su.id sysuser_id,su.`name` sysuser_name,su.email sysuser_email,su.phone sysuser_phone
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN (
+            SELECT * FROM bpms_bond_matter
+            WHERE template_id=#{templateId} AND status=0
+            GROUP BY template_id,bond_code
+        ) tcm ON t1.code=tcm.bond_code
+        LEFT JOIN bpms_area tp ON t2.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t2.city_code=tc.`code`
+        LEFT JOIN bpms_bond_manager tbm ON t1.`code`=tbm.bond_code
+        LEFT JOIN sys_user su ON tbm.user_id=su.id
+        WHERE t1.`status`!=4
+        <if test="null != linkman and linkman != '' and linkman== 0">
+            AND tcm.id IS NOT NULL
+        </if>
+        <if test="null != linkman and linkman != '' and linkman== 1">
+            AND tcm.id IS NULL
+        </if>
+        <if test="bondname != null and bondname != ''">
+            AND (t1.code LIKE '%' #{bondname} '%' OR t1.shortname LIKE '%' #{bondname} '%')
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t2.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t2.city_code =#{cityCode}
+        </if>
+        <if test="listedPlace != null and listedPlace.size()>0">
+            AND (
+            <foreach item="placeItem" collection="listedPlace" open="(" separator="OR" close=")">
+                find_in_set(#{placeItem}, REPLACE(t1.listed_place,';',','))
+            </foreach>
+            )
+        </if>
+        <if test="type != null and type.size()>0">
+            AND (
+            <foreach item="typeItem" collection="type" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, t1.type)
+            </foreach>
+            )
+        </if>
+        <if test="userId != null and userId.size()>0">
+            AND (
+            <foreach item="userIdItem" collection="userId" open="(" separator="OR" close=")">
+                find_in_set(#{userIdItem}, tbm.user_id)
+            </foreach>
+            )
+        </if>
+
+        <if test="timeLimitBegin != null and timeLimitBegin != ''">
+            AND t1.time_limit &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd != null and timeLimitEnd != ''">
+            AND t1.time_limit &lt;= #{timeLimitEnd}
+        </if>
+        <if test="valueDateBegin != null and valueDateBegin != ''">
+            AND t1.value_date &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd != null and valueDateEnd != ''">
+            AND t1.value_date &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin != null and payDayBegin != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &gt;= #{payDayBegin}
+        </if>
+        <if test="payDayEnd != null and payDayEnd != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &lt;= #{payDayEnd}
+        </if>
+        <if test="listedDateBegin != null and listedDateBegin != ''">
+            AND t1.listed_date &gt;= #{listedDateBegin}
+        </if>
+        <if test="listedDateEnd != null and listedDateEnd != ''">
+            AND t1.listed_date &lt;= #{listedDateEnd}
+        </if>
+
+        <if test="currentBalanceBegin != null and currentBalanceBegin != ''">
+            AND t1.current_balance &gt;= #{currentBalanceBegin}
+        </if>
+        <if test="currentBalanceEnd != null and currentBalanceEnd != ''">
+            AND t1.current_balance &lt;= #{currentBalanceEnd}
+        </if>
+
+        <if test="crossMarket != null and crossMarket.size()>0">
+            AND (
+            <foreach item="crossMarketItem" collection="crossMarket" open="(" separator="OR" close=")">
+                find_in_set(#{crossMarketItem}, t1.cross_market)
+            </foreach>
+            )
+        </if>
+
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(t1.guarantee_company_1,'')='' OR t1.guarantee_company_1='无' OR IFNULL(t1.guarantee_company_2,'')='' OR t1.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany !="无"'>
+            AND (t1.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR t1.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t1.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t1.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !=''">
+            AND t1.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        <if test="underwriterName != null and underwriterName != ''">
+            AND t1.underwriter_name like '%' #{underwriterName} '%'
+        </if>
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <update id="updateSetBondExpire">
+        UPDATE bpms_bond SET status=#{status},update_time=NOW() WHERE id=#{id}
+    </update>
+
+    <update id="updateResetBondExpire">
+        UPDATE bpms_bond SET status=#{status},update_time=NOW() WHERE id=#{id}
+    </update>
+
+    <update id="removeBond">
+        UPDATE bpms_bond SET status=#{status},update_time=NOW() WHERE id=#{id}
+    </update>
+
+    <select id="findBondInfoByCompany" resultType="Bond">
+        SELECT t1.* FROM bpms_bond t1 JOIN bpms_company t2 ON t1.company_name=t2.name
+        WHERE t1.status!=4 AND t1.company_name=#{companyName}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <update id="updateBondExpire">
+        UPDATE bpms_bond SET status=1,update_time=NOW() WHERE status=0 AND pay_day&lt;=DATE(NOW())
+    </update>
+
+    <select id="findIsExistence" resultType="int">
+        SELECT COUNT(id) FROM bpms_bond WHERE code=#{bondCode} AND `status`!=4
+    </select>
+
+    <select id="findBondExcel" resultMap="bondResultMap">
+        SELECT t1.*,
+        t2.id comp_id,t2.`name` comp_name,t2.shortname comp_shortname,
+        t2.industry_scale comp_industryScale,t2.economic_sector comp_economicSector,t2.industry_type comp_industryType,
+        t2.industry_big_type comp_industryBigType,t2.economic_department comp_economicDepartment,t2.economic_department_detail comp_economicDepartmentDetail,
+        t2.stock_code comp_stockCode,t2.rating_company_1 comp_ratingCompany1,t2.corporate_rating_1 comp_corporateRating1,
+        t2.rating_company_2 comp_ratingCompany2,t2.corporate_rating_2 comp_corporateRating2,t2.corporate_org_code_2 comp_corporateOrgCode2,
+        t2.province_code comp_provinceCode,t2.city_code comp_cityCode,t2.status comp_status,
+        t3.id manager_id,t3.bond_code manager_bond_code,t3.user_id manager_user_id,
+        sysuser.id sysuser_id,sysuser.name sysuser_name, sysuser.account_number sysuser_account_number,sysuser.email sysuser_email,sysuser.phone sysuser_phone,
+        tp.`name` comp_provinceName,tc.`name` comp_cityName,
+        clm.id companyLinkman_id,clm.company_name companyLinkman_company_name,clm.name companyLinkman_name,clm.phone companyLinkman_phone,
+        clm.mobile companyLinkman_mobile,clm.mail companyLinkman_mail,clm.create_time companyLinkman_create_time,
+        bm.id bankManager_id,bm.bond_code bankManager_bond_code,bm.name bankManager_name,bm.phone bankManager_phone,
+        bm.mobile bankManager_mobile,bm.email bankManager_email,bm.create_time bankManager_create_time
+        FROM bpms_bond t1 LEFT JOIN bpms_company t2 ON t1.company_name=t2.`name` AND t2.`status`=0
+        LEFT JOIN bpms_company_linkman clm ON t2.name=clm.company_name
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT tbm1.*
+            FROM bpms_bond_manager tbm1 JOIN (
+            SELECT DISTINCT bond_code FROM bpms_bond_manager WHERE user_id=#{manageruser}
+            ) tbm2 ON tbm1.bond_code=tbm2.bond_code
+            ) t3 ON t1.code=t3.bond_code
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+            LEFT JOIN bpms_bond_manager t3 ON t1.code=t3.bond_code
+        </if>
+        LEFT JOIN sys_user sysuser ON t3.user_id=sysuser.id
+        LEFT JOIN bpms_bank_manager bm ON t1.code=bm.bond_code
+        LEFT JOIN bpms_area tp ON t2.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t2.city_code=tc.`code`
+        WHERE t1.status!=4
+        <if test="id != null and id != ''">
+            AND t1.id=#{id}
+        </if>
+        <if test="bondname != null and bondname != ''">
+            AND (t1.code LIKE '%' #{bondname} '%' OR t1.shortname LIKE '%' #{bondname} '%' OR t1.company_name LIKE '%' #{bondname} '%')
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t2.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t2.city_code =#{cityCode}
+        </if>
+        <if test="listedPlace != null and listedPlace.size()>0">
+            AND (
+            <foreach item="placeItem" collection="listedPlace" open="(" separator="OR" close=")">
+                find_in_set(#{placeItem}, REPLACE(listed_place,';',','))
+            </foreach>
+            )
+        </if>
+        <if test="type != null and type.size()>0">
+            AND (
+            <foreach item="typeItem" collection="type" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, type)
+            </foreach>
+            )
+        </if>
+        <if test="userId != null and userId.size()>0">
+            AND (
+            <foreach item="userIdItem" collection="userId" open="(" separator="OR" close=")">
+                find_in_set(#{userIdItem}, t3.user_id)
+            </foreach>
+            )
+        </if>
+        <if test="timeLimitBegin != null and timeLimitBegin != ''">
+            AND t1.time_Limit &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd != null and timeLimitEnd != ''">
+            AND t1.time_Limit &lt;= #{timeLimitEnd}
+        </if>
+        <if test="valueDateBegin != null and valueDateBegin != ''">
+            AND t1.value_date &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd != null and valueDateEnd != ''">
+            AND t1.value_date &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin != null and payDayBegin != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &gt;= #{payDayBegin}
+        </if>
+        <if test="payDayEnd != null and payDayEnd != ''">
+            AND DATE_FORMAT(t1.pay_day,'%Y') &lt;= #{payDayEnd}
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(t1.guarantee_company_1,'')='' OR t1.guarantee_company_1='无' OR IFNULL(t1.guarantee_company_2,'')='' OR t1.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany !="无"'>
+            AND (t1.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR t1.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t1.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t1.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !=''">
+            AND t1.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        ORDER BY t1.status,t1.create_time DESC
+    </select>
+    <select id="findBondExpire" resultType="Bond">
+        select * from bpms_bond WHERE status=0 AND pay_day&lt;=DATE(NOW())
+    </select>
+    <select id="findCountByCompanyName" resultType="java.lang.Integer">
+          select count(*) from bpms.bpms_bond where company_name = #{company} and status != 4
+    </select>
+    <update id="updateBondExpireByCode">
+        UPDATE bpms_bond SET status=1,update_time=NOW() WHERE code=#{code}
+    </update>
+
+    <update id="updateAssociationCompany">
+        UPDATE bpms_bond a
+          LEFT JOIN bpms_company_linkman b ON a.company_name = b.company_name
+          LEFT JOIN bpms_company_matter c ON a.company_name = c.company_name
+          LEFT JOIN bpms_history d ON a.company_name = d.company_name
+          LEFT JOIN bpms_upload e ON a.company_name = e.company_name
+          SET a.company_name = #{newName},
+           b.company_name = #{newName},
+           c.company_name = #{newName},
+           d.company_name = #{newName},
+           e.company_name = #{newName}
+          WHERE
+           a.company_name = #{sName} and a.status = 0;
+    </update>
+</mapper>

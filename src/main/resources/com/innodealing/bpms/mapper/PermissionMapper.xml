@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.PermissionMapper">
+    <select id="findAll" resultType="Permission">
+        SELECT * from permission
+    </select>
+    <select id="findById" resultType="Permission">
+        SELECT * from permission where id=#{id}
+    </select>
+    <select id="findByRoleId" resultType="Permission">
+        SELECT a.id,a.code,a.name,a.module_id,a.`description` FROM permission a INNER JOIN role_permission b
+        ON a.id=b.`permission_id` WHERE b.`role_id`=#{roleId}
+    </select>
+    <select id="findByModuleId" resultType="Permission">
+        SELECT * from permission where module_id=#{moduleId}
+    </select>
+    <select id="findByIds" resultType="Permission">
+        SELECT * from permission where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findByPage" parameterType="ReqData" resultType="Permission">
+        SELECT * from permission where module_id=#{moduleId}
+    </select>
+    <!--Insert-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="Permission">
+        INSERT INTO permission (`name`, code, module_id,description)
+        VALUES (#{name}, #{code}, #{moduleId},#{description})
+    </insert>
+    <delete id="delete">
+        delete from permission WHERE id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByModuleIds">
+        delete from permission WHERE module_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="getPermissionsByUserId" resultType="string">
+        SELECT CONCAT(e.`code`,':',d.`code`) AS `code` FROM sys_user a
+        INNER JOIN  user_role b on a.id=b.user_id
+        INNER JOIN role_permission c ON b.role_id=c.`role_id`
+        INNER JOIN permission d ON c.`permission_id`=d.`id`
+        INNER JOIN module e ON d.`module_id`=e.`id`
+        WHERE a.`id`=#{userId}
+    </select>
+</mapper>

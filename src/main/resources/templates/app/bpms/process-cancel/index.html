@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title>事项</title>
+    <!--全局样式-->
+    <div th:replace="shared/sharedcss"></div>
+    <!-- 全局js -->
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <script th:src="@{/js/common/pagination.js}"></script>
+    <script th:src="@{/js/app/bpms/process-cancel/index.js}"></script>
+</head>
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <input id="processId" type="text"></input>
+                    <button id="cancel" onclick="cancelProcess()">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+

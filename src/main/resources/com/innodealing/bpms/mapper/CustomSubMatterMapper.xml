@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CustomSubMatterMapper">
+
+    <!--Insert-->
+    <insert id="insertCustomSubMatter" useGeneratedKeys="true" keyProperty="id" parameterType="CustomSubMatter">
+        INSERT INTO bpms_custom_sub_matter (custom_id, order_index, `name`, before_day, complete_before_day, mail_before_day, mail_frequency, content, create_time)
+        VALUES (#{customId}, #{orderIndex}, #{name}, #{beforeDay}, #{completeBeforeDay}, #{mailBeforeDay}, #{mailFrequency}, #{content}, NOW())
+    </insert>
+
+    <insert id="insertCustomSubMatterList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_custom_sub_matter (custom_id, order_index, `name`, before_day, complete_before_day, mail_before_day, mail_frequency, content, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.customId}, #{item.orderIndex}, #{item.name}, #{item.beforeDay}, #{item.completeBeforeDay}, #{item.mailBeforeDay}, #{item.mailFrequency}, #{item.content}, NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteByCustomId">
+        DELETE FROM bpms_custom_sub_matter WHERE custom_id = #{customId}
+    </delete>
+    <select id="findByProcessId" resultType="CustomSubMatter">
+       SELECT a.order_index,b.sub_name as `name`,b.sub_before_day as beforeDay,b.sub_complete_before_day as completeBeforeDay,b.complete_date,b.mail_before_day,b.content
+       FROM  bpms_survive_process a
+        INNER JOIN bpms_process_info b
+        ON a.process_id = b.process_id
+        INNER JOIN (SELECT custom_id,DATE_FORMAT(create_time,'%y-%m-%d') AS create_time
+        FROM bpms_survive_process WHERE process_id=#{processId}) AS tmp
+        ON a.custom_id = tmp.custom_id AND DATE_FORMAT(a.create_time,'%y-%m-%d')=tmp.create_time
+         WHERE  a.status not in (2,4)
+        ORDER BY a.order_index ASC
+    </select>
+    <select id="findByProcessId1" resultType="CustomSubMatter">
+        SELECT a.* ,c.complete_date FROM `bpms_custom_sub_matter` a
+        INNER JOIN `bpms_survive_process` b ON a.custom_id=b.custom_id
+        INNER JOIN `bpms_process_info` c ON b.process_id=c.process_id
+        WHERE c.process_id=#{processId}
+        ORDER BY a.order_index ASC
+    </select>
+</mapper>

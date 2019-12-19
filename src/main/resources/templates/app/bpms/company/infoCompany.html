@@ -1,0 +1,98 @@
+
+<div class="row link-company-title">
+    <div class="col-sm-12">
+        <div class="col-sm-6">
+            <span id="divCompanyName" class="font-size-18" th:text="${companyInfo.name}"></span>
+        </div>
+        <div class="col-sm-6">
+            <span class="col-sm-4"></span>
+            <span class="col-sm-1 link-area-color">省</span>
+            <span class="col-sm-3" id="spanProvinceName" th:text="${companyInfo.provinceName}"></span>
+            <span class="col-sm-1 link-area-color">市</span>
+            <span class="col-sm-3" id="spanCityName" th:text="${companyInfo.cityName}"></span>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-6">
+            <span class="link-area-color">主体评级1</span>
+            <span id="corporateRating1s" th:text="${companyInfo.corporateRating1}"></span>
+        </div>
+        <div class="col-sm-6">
+            <span class="col-sm-4"></span>
+            <span class="col-sm-2 link-area-color">行业</span>
+            <span class="col-sm-6" id="industryBigTypes" th:text="${companyInfo.industryBigTypeName}"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-3 link-company-label">上市公司股票代码</div>
+    <div id="stockCode" class="col-sm-3 link-company-text" th:text="${companyInfo.stockCode}"></div>
+    <div class="col-sm-3 link-company-label">发行人企业规模</div>
+    <div id="industryScale" class="col-sm-3 link-company-text" th:text="${companyInfo.industryScale}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">债券发行人个数</div>
+    <div class="col-sm-3 link-company-text" th:text="${companyInfo.companyCount}"></div>
+    <div class="col-sm-3 link-company-label">发行人经济成分</div>
+    <div id="economicSector" class="col-sm-3 link-company-text" th:text="${companyInfo.economicSector}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">发行人行业（门类）</div>
+    <div id="industryType" class="col-sm-3 link-company-text" th:text="${companyInfo.industryTypeName}"></div>
+    <div class="col-sm-3 link-company-label">发行人行业（大类）</div>
+    <div id="industryBigType" class="col-sm-3 link-company-text" th:text="${companyInfo.industryBigTypeName}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">发行人国民经济部门（一级分类）</div>
+    <div id="economicDepartment" class="col-sm-3 link-company-text" th:text="${companyInfo.economicDepartmentName}"></div>
+    <div class="col-sm-3 link-company-label">发行人国民经济部门（明细分类）</div>
+    <div id="economicDepartmentDetail" class="col-sm-3 link-company-text" th:text="${companyInfo.economicDepartmentDetailName}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">主体评级机构名称1</div>
+    <div id="ratingCompany1" class="col-sm-3 link-company-text" th:text="${companyInfo.ratingCompany1}"></div>
+    <div class="col-sm-3 link-company-label">发行时主体评级1</div>
+    <div id="corporateRating1" class="col-sm-3 link-company-text" th:text="${companyInfo.corporateRating1}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">主体评级机构名称2</div>
+    <div id="ratingCompany2" class="col-sm-3 link-company-text" th:text="${companyInfo.ratingCompany2}"></div>
+    <div class="col-sm-3 link-company-label">主体评级机构组织机构代码2</div>
+    <div id="corporateOrgCode2" class="col-sm-3 link-company-text" th:text="${companyInfo.corporateOrgCode2}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-3 link-company-label">发行时主体评级2</div>
+    <div id="corporateRating2" class="col-sm-3 link-company-text" th:text="${companyInfo.corporateRating2}"></div>
+</div>
+
+<br/>
+<br/>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="tabs-container">
+            <ul id="sysuserTab" class="nav nav-tabs layer-tabs">
+                <li class="active">
+                    <a id="tab-linkBond" data-toggle="tab" href="#tab-infoLinkBond" aria-expanded="true">项目负责人</a>
+                </li>
+                <li class="">
+                    <a id="tab-linkCompany" data-toggle="tab" href="#tab-infoLinkCompany" aria-expanded="false">发行人对接人</a>
+                </li>
+            </ul>
+            <div class="tab-content padding-top-1">
+                <div id="tab-infoLinkBond" class="tab-pane active">
+                    <div id="divInfoLinkBond" class="panel-body" style="padding-top:0px;">
+                    </div>
+                </div>
+                <div id="tab-infoLinkCompany" class="tab-pane">
+                    <div id="divInfoLinkCompany" class="panel-body" style="padding-top:0px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:src="@{/js/app/bpms/company/infoCompany.js}"></script>

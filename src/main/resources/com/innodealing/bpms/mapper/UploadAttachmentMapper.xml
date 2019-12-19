@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.UploadAttachmentMapper">
+
+    <!--Insert-->
+    <insert id="insertUploadAttachmentList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_upload_attachment (upload_id, `type`, `name`,  url, description, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.uploadId}, #{item.type}, #{item.name}, #{item.url}, #{item.description}, NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteUploadAttachmentById">
+        DELETE FROM bpms_upload_attachment WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteUploadAttachmentByUploadId">
+        DELETE FROM bpms_upload_attachment WHERE upload_id = #{uploadId}
+    </delete>
+
+</mapper>

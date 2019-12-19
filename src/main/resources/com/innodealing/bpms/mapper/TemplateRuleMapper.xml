@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.TemplateRuleMapper">
+
+    <select id="findAll" resultType="TemplateRule">
+        SELECT * FROM bpms_template_rule ORDER BY template_id,create_time DESC
+    </select>
+
+    <select id="findById" resultType="TemplateRule">
+        SELECT * FROM bpms_template_rule WHERE id=#{id}
+    </select>
+
+    <select id="findByTemplateId" resultType="TemplateRule">
+        SELECT * FROM bpms_template_rule WHERE template_id=#{templateId}
+    </select>
+
+    <!--Insert-->
+    <insert id="insertTemplateRule" useGeneratedKeys="true" keyProperty="id" parameterType="TemplateRule">
+        INSERT INTO bpms_template_rule (template_id, `type`, remind_date, complete_date, before_day, complete_before_day, create_time)
+        VALUES (#{templateId}, #{type}, #{remindDate}, #{completeDate}, #{beforeDay}, #{completeBeforeDay}, NOW())
+    </insert>
+
+    <insert id="insertTemplateRuleList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_template_rule (template_id, `type`, remind_date, complete_date, before_day, complete_before_day, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.templateId}, #{item.type}, #{item.remindDate}, #{item.completeDate}, #{item.beforeDay}, #{item.completeBeforeDay}, NOW())
+        </foreach>
+    </insert>
+
+    <!--Update-->
+    <update id="updateTemplateRule" parameterType="TemplateRule">
+        UPDATE bpms_template_rule SET
+        template_id = #{templateId},
+        `type` = #{type},
+        remind_date = #{remindDate},
+        complete_date = #{completeDate},
+        before_day = #{beforeDay},
+        complete_before_day = #{completeBeforeDay}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM bpms_template_rule WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByTemplateId">
+        DELETE FROM bpms_template_rule WHERE template_id = #{templateId}
+    </delete>
+
+
+    <update id="updateTemplateRuleList"  parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE bpms_template_rule
+            <set>
+                type = #{item.type},
+                remind_date = #{item.remindDate},
+                complete_date = #{item.completeDate},
+                before_day = #{item.beforeDay},
+                complete_before_day = #{item.completeBeforeDay}
+            </set>
+            WHERE id=#{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteByIds" parameterType="java.util.Map">
+        DELETE FROM bpms_template_rule WHERE template_id=#{map.templateId}
+        <if test="map.ids != null and map.ids.length>0">
+            AND id NOT IN
+            <foreach collection="map.ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

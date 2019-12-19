@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title>审核事项</title>
+    <!--全局样式-->
+    <div th:replace="shared/sharedcss"></div>
+    <link th:href="@{/css/bpms/matter-common/index.css}" rel="stylesheet"/>
+    <!-- 全局js -->
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+
+    <script th:src="@{/js/app/bpms/inspector-matter/index.js}"></script>
+</head>
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <span class="span_content span_space span_color" id="undoMatter">
+                            未完成事项
+                        </span>
+                    <span class="span_content span_space" id="overMatter">
+                            已完成事项
+                        </span>
+                </div>
+                <div class="ibox-content">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+

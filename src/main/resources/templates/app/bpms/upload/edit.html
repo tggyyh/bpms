@@ -1,0 +1,100 @@
+<script th:src="@{/js/app/bpms/upload/edit.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="uploadForm" class="form-horizontal m-t" enctype="multipart/form-data">
+                        <input type="hidden" id="hid_upload_id" th:value="${upload.id}" />
+                        <input type="hidden" id="hid_upload_type" th:value="${upload.type}" />
+                        <input type="hidden" id="hid_upload_companyName" th:value="${upload.companyName}" />
+
+                        <div class="form-group tmp-col hide">
+                            <label class="col-sm-3 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>事项名称：
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="upload_name" name="upload_name" type="text" class="form-control" th:value="${upload.name}" />
+                            </div>
+                        </div>
+
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-3 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>材料说明：
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="upload_description" name="upload_description" type="text" class="form-control" th:value="${upload.description}" />
+                            </div>
+                        </div>
+
+                        <div th:class="${upload.type}==0?'form-group tmp-col':'form-group tmp-col hide'">
+                            <label class="col-sm-3 control-label">所属项目：</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="hidden" id="upload_bondCode" name="upload_bondCode" th:value="${upload.bondCode}"/>
+                                    <input type="text" id="upload_bondName" name="upload_bondName" th:value="${upload.bondName}" class="form-control" />
+                                    <div class="input-group-btn">
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group tmp-col">
+                            <label class="col-sm-3 control-label">
+                                <div class="glyphicon glyphicon-asterisk form-required"></div>上传材料：
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="col-sm-12 tmp-bgcolor-y">
+                                    <span class="fa fa-paperclip tmp-font-20 tmp-padding-5"></span>
+                                    <span class="tmp-padding-5">共<span id="upload_spanFileNum" th:text="null==${upload.uploadAttachmentList}?0:${upload.uploadAttachmentList.size()}"></span>个文件</span>
+                                    <span id="upload_fileDownloadAll" class="tmp-link tmp-padding-5">全部下载</span>
+                                    <span id="upload_fileRemoveAll" class="tmp-link tmp-font-red tmp-padding-5">全部删除</span>
+                                </div>
+
+                                <div id="upload_tmpFiles" class="col-sm-12 tmpFiles">
+                                    <div class="tmp-file" style="width:100%;text-align:left;" th:each="templateAttachment,templateAttachmentStat:${upload.uploadAttachmentList}">
+                                        <input type="hidden" name="templateAttachment.type" th:value="${templateAttachment.type}" />
+                                        <input type="hidden" name="templateAttachment.name" th:value="${templateAttachment.name}" />
+                                        <input type="hidden" name="templateAttachment.url" th:value="${templateAttachment.url}"/>
+                                        <!--<div th:class="'tmp-file-' + ${templateAttachment.type}" th:title="${templateAttachment.name}">-->
+                                        <!--</div>-->
+                                        <!--<div class="tmp-file-content tmp-font-12" th:title="${templateAttachment.name}" th:text="${templateAttachment.name}">-->
+                                        <!--</div>-->
+                                        <!--<div class="tmp-file-down" onclick="downUploadFile(this)">下载</div>-->
+                                        <!--<div class="tmp-file-remove" onclick="removeUploadFile(this)">删除</div>-->
+                                        <div th:title="${templateAttachment.name}" th:text="${templateAttachment.name}" style="float:left;max-width:85%;padding:5px 0;display:block;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">
+
+                                        </div>
+                                        <div class="tmp-file-down" style="padding:5px;" onclick="downUploadFile(this)">下载</div>
+                                        <div class="tmp-file-remove" style="padding:5px;" onclick="removeUploadFile(this)">删除</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5">
+                                    <input id="upload_tmpFile" name="file" class="file hide" type="file" multiple="multiple" onchange="setUploadTmpFile(this)" />
+                                    <div id="upload_addTmpFile" class="glyphicon glyphicon-plus-sign tmp-time-plus" data-original-title="AddFile">
+                                        <span>添加所需材料</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/><br/><br/>
+
+                        <div class="form-group tmp-col">
+                            <div class="col-sm-8 col-sm-offset-7 div-top-20">
+                                <button id="uploadSave" name="uploadSave" class="btn btn-success" type="button">保存
+                                </button>
+                                <button id="uploadCancel" name="uploadCancel" class="btn btn-default" type="button">取消
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="hidControl" name="hidControl" value="00" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

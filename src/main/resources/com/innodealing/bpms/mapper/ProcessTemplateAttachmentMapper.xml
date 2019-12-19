@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.ProcessTemplateAttachmentMapper">
+    <insert id="insertProcessTemplateAttachment" useGeneratedKeys="true" keyProperty="id">
+        insert into bpms_process_template_attachment (process_id, type, name, url,description) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.processId},#{item.type}, #{item.name}, #{item.url}, #{item.description})
+        </foreach>
+    </insert>
+    <delete id="deleteProcessTemplateAttachment">
+        delete from bpms_process_template_attachment where process_id=#{processId}
+    </delete>
+</mapper>

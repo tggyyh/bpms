@@ -1,0 +1,44 @@
+
+<nav th:fragment="leftMenu" class="navbar-default navbar-static-side" role="navigation">
+    <div class="nav-close"><i class="fa fa-times-circle"></i>
+    </div>
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li th:class="${not #lists.isEmpty(firstModule.modules)} ? ''" th:each="firstModule,firstStat:${userModule}">
+                <a th:class="${#lists.isEmpty(firstModule.modules)} ? 'J_menuItem'" th:href="${firstModule.url}" th:data-index="${#lists.isEmpty(firstModule.modules)} ? ${firstModule.id}">
+                    <i class="fa fa-home"></i>
+                    <span class="nav-label" th:text="${firstModule.name}"></span>
+                    <span th:id="'span_'+${firstModule.code}"></span>
+                    <span th:if="${not #lists.isEmpty(firstModule.modules)}" class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li th:class="${not #lists.isEmpty(secondModule.modules)} ? ''" th:each="secondModule,secondStat:${firstModule.modules}">
+                        <a th:class="${#lists.isEmpty(secondModule.modules)} ? 'J_menuItem'" th:href="${secondModule.url}" th:data-index="${#lists.isEmpty(secondModule.modules)} ? ${secondModule.id}">
+                            <span class="nav-label" th:text="${secondModule.name}"></span>
+                            <span th:id="'span_'+${secondModule.code}"></span>
+                            <span th:if="${not #lists.isEmpty(secondModule.modules)}" class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-third-level">
+                            <li th:class="${not #lists.isEmpty(thirdModule.modules)} ? ''" th:each="thirdModule,thirdStat:${secondModule.modules}">
+                                <a th:class="${#lists.isEmpty(thirdModule.modules)} ? 'J_menuItem'" th:href="${thirdModule.url}" th:data-index="${#lists.isEmpty(thirdModule.modules)} ? ${thirdModule.id}">
+                                    <span class="nav-label" th:text="${thirdModule.name}"></span>
+                                    <span th:id="'span_'+${thirdModule.code}"></span>
+                                    <span th:if="${not #lists.isEmpty(thirdModule.modules)}" class="fa arrow"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <shiro:hasRole name="inspector_check">
+        <div id="bellDiv" class="menu-bell">
+            <a class="glyphicon glyphicon-bell" onclick="manualTask()">
+                <span >当天可触发(</span>
+                <span id="matter_count">0</span>
+                <span>)</span>
+            </a>
+        </div>
+        </shiro:hasRole>
+    </div>
+</nav>

@@ -1,0 +1,50 @@
+<div th:replace="shared/fuwenben"></div>
+<script th:src="@{/js/app/bpms/process-history/view.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="processHistory" class="form-horizontal m-t"  enctype="multipart/form-data">
+                        <div th:each="ph,stat :${phs}">
+                            <div style="float:left">
+                                <span th:text="${stat.size-stat.index}"></span>
+                                <span >.</span>
+                                <span th:text="${#dates.format(ph.createTime, 'yyyy-MM-dd HH:mm:ss')}"> </span>
+                                <span>,由</span>
+                                <span th:text="${ph.name}" style="font-weight: bold"></span>
+                                <span th:text="${ph.mark}"></span>
+                            </div>
+                            <div class="fa fa-plus-square-o historylog-icon" th:id="'divItem-'+${stat.count}" onclick="showItemContent(this)"/>
+
+                            <div th:name="'divItem-'+${stat.count}" class="history-background hide" th:if="${ph.taskType}==1">
+                                <div th:each="change :${ph.changeList}">
+                                    <span th:utext="${change}"></span>
+                                </div>
+                            </div>
+                            <div th:name="'divItem-'+${stat.count}" class="history-background hide" th:if="${ph.taskType}==2">
+                                <div>
+                                    <label >事项材料：</label>
+                                    <span th:each="pa :${ph.pi.processAttachmentList}" th:text="${pa.name}+'，'">
+
+                                    </span>
+                                </div>
+                                <div>
+                                    <label >处理说明：</label>
+                                    <span th:text="${ph.pi.mark}"></span>
+                                </div>
+                            </div>
+                            <div th:name="'divItem-'+${stat.count}" class="history-background hide" th:if="${ph.taskType}==3">
+                                <div th:if="${ph.pi.reason}!=''">
+                                    <label >退回理由：</label>
+                                    <span th:text="${ph.pi.reason}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

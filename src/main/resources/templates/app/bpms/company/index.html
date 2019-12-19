@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="shared/sharedcss"></div>
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <script th:src="@{/js/app/bpms/company/index.js}"></script>
+</head>
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="ibox">
+
+                <div class="ibox-title">
+                    <span class="tmp-head">发行人管理</span>
+                    <shiro:hasPermission name="project-manage:edit">
+                        <input type="hidden" id="hasPermission" />
+                    </shiro:hasPermission>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="form-group">
+
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label col-sm-1 label-top-5 text-right">省：</label>
+                                <div class="col-sm-2">
+                                    <select id="drop_search_province" name="type" class="form-control" tabindex="2">
+                                    </select>
+                                </div>
+                                <label class="control-label col-sm-1 label-top-5 text-right">市：</label>
+                                <div class="col-sm-2">
+                                    <select id="drop_search_city" name="type" class="form-control" tabindex="2">
+                                    </select>
+                                </div>
+
+                                <div class="input-group col-sm-3">
+                                    <input type="text" id="txt_search_name" class="form-control" placeholder="发行人" />
+                                    <span class="input-group-btn">
+                                        <button type="button" id="btn_query" class="btn glyphicon glyphicon-search search-color" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table id="tabCompany" style="table-layout:fixed;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

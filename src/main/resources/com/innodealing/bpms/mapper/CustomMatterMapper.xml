@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CustomMatterMapper">
+    <resultMap id="customMatterResultMap" type="CustomMatter">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="rightLine" column="right_line"/>
+        <result property="key" column="key"/>
+        <result property="name" column="name"/>
+        <result property="shortname" column="shortname"/>
+        <result property="description" column="description"/>
+        <result property="color" column="color" />
+        <result property="confirm" column="confirm" />
+        <result property="mailUser" column="mail_user" />
+        <result property="mailBeforeDay" column="mail_before_day"/>
+        <result property="mailFrequency" column="mail_frequency" />
+        <result property="status" column="status" />
+        <result property="relation" column="relation" />
+        <result property="content" column="content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <collection property="customRuleList" ofType="CustomRule">
+            <id property="id" column="rule_id"/>
+            <result property="customId" column="rule_custom_id"/>
+            <result property="type" column="rule_type"/>
+            <result property="remindDate" column="rule_remind_date"/>
+            <result property="completeDate" column="rule_complete_date"/>
+            <result property="beforeDay" column="rule_before_day"/>
+            <result property="completeBeforeDay" column="rule_complete_before_day"/>
+            <result property="createTime" column="rule_create_time"/>
+        </collection>
+        <collection property="customAttachmentList" ofType="CustomAttachment">
+            <id property="id" column="attachment_id"/>
+            <result property="customId" column="attachment_custom_id"/>
+            <result property="type" column="attachment_type"/>
+            <result property="name" column="attachment_name"/>
+            <result property="url" column="attachment_url"/>
+            <result property="description" column="attachment_description"/>
+            <result property="createTime" column="attachment_create_time"/>
+        </collection>
+        <collection property="customSubMatterList" ofType="CustomSubMatter">
+            <id property="id" column="custom_sub_id"/>
+            <result property="customId" column="custom_sub_custom_id"/>
+            <result property="orderIndex" column="custom_sub_order_index"/>
+            <result property="name" column="custom_sub_name"/>
+            <result property="beforeDay" column="custom_sub_before_day"/>
+            <result property="completeBeforeDay" column="custom_sub_complete_before_day"/>
+            <result property="mailBeforeDay" column="custom_sub_mail_before_day"/>
+            <result property="mailFrequency" column="custom_sub_mail_frequency"/>
+            <result property="content" column="custom_sub_content"/>
+            <result property="createTime" column="custom_sub_create_time"/>
+            <result property="beforeDate" column="custom_sub_before_date"/>
+            <result property="completeBeforeDate" column="custom_sub_complete_before_date"/>
+            <result property="mailBeforeDate" column="custom_sub_mail_before_date"/>
+        </collection>
+    </resultMap>
+
+    <select id="findAllCustomMatter" resultType="CustomMatter">
+        SELECT * FROM bpms_custom_matter
+        ORDER BY type,create_time DESC
+    </select>
+
+    <select id="findCustomMatterByKey" resultType="CustomMatter">
+        SELECT * FROM bpms_custom_matter
+        WHERE `type`=#{type} AND `key`=#{key} AND relation=#{relation} AND status=#{status}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByKey" resultMap="customMatterResultMap">
+        SELECT
+            t1.*,
+            t2.id rule_id,t2.custom_id rule_custom_id,t2.type rule_type,
+            t2.remind_date rule_remind_date,t2.complete_date rule_complete_date,
+            t2.before_day rule_before_day,t2.complete_before_day rule_complete_before_day,
+            t2.create_time rule_create_time,
+            t3.id custom_sub_id,t3.custom_id custom_sub_custom_id,t3.order_index custom_sub_order_index,
+            t3.name custom_sub_name,t3.before_day custom_sub_before_day,t3.complete_before_day custom_sub_complete_before_day,
+            t3.mail_before_day custom_sub_mail_before_day,t3.mail_frequency custom_sub_mail_before_day
+        FROM bpms_custom_matter t1 LEFT JOIN bpms_custom_rule t2 ON t1.id=t2.custom_id
+        LEFT JOIN bpms_custom_sub_matter t3 ON t1.id=t3.custom_id
+        WHERE t1.`type`=#{type} AND t1.`key`=#{key} AND t1.status=#{status}
+        ORDER BY t1.relation DESC,t1.create_time DESC
+    </select>
+
+    <select id="findById" resultMap="customMatterResultMap">
+        SELECT t1.*,
+        t2.id rule_id,t2.custom_id rule_custom_id,t2.type rule_type,t2.remind_date rule_remind_date,t2.complete_date rule_complete_date,t2.before_day rule_before_day,t2.complete_before_day rule_complete_before_day,t2.create_time rule_create_time,
+        t3.id attachment_id,t3.custom_id attachment_custom_id,t3.type attachment_type,t3.name attachment_name,t3.url attachment_url,t3.description attachment_description,t3.create_time attachment_create_time,
+        t4.id custom_sub_id,t4.custom_id custom_sub_custom_id,t4.order_index custom_sub_order_index,t4.name custom_sub_name,
+        t4.before_day custom_sub_before_day,t4.complete_before_day custom_sub_complete_before_day,
+        t4.mail_before_day custom_sub_mail_before_day,t4.mail_frequency custom_sub_mail_frequency,
+        t4.content custom_sub_content,t4.create_time custom_sub_create_time
+        FROM bpms_custom_matter t1
+        LEFT JOIN bpms_custom_rule t2 ON t1.id=t2.custom_id
+        LEFT JOIN bpms_custom_attachment t3 ON t1.id=t3.custom_id
+        LEFT JOIN bpms_custom_sub_matter t4 ON t1.id=t4.custom_id AND t1.right_line=1
+        WHERE t1.id=#{id} AND t1.status=0
+        ORDER BY t4.order_index
+    </select>
+
+    <!--Insert-->
+    <insert id="insertCustomMatter" useGeneratedKeys="true" keyProperty="id" parameterType="CustomMatter">
+        INSERT INTO bpms_custom_matter (`type`, right_line, `key`, `name`, shortname, description, color, content, confirm, mail_user, mail_before_day, mail_frequency, status, relation, create_time, update_time)
+        VALUES (#{type}, #{rightLine}, #{key}, #{name}, #{shortname}, #{description}, #{color}, #{content}, #{confirm}, #{mailUser}, #{mailBeforeDay}, #{mailFrequency}, #{status}, #{relation}, NOW(), NOW())
+    </insert>
+
+    <!--Update-->
+    <update id="updateCustomMatter" parameterType="CustomMatter">
+        UPDATE bpms_custom_matter SET
+        `type` = #{type},
+        right_line = #{rightLine},
+        `key`=#{key},
+        `name` = #{name},
+        shortname = #{shortname},
+        description = #{description},
+        color = #{color},
+        content= #{content},
+        confirm=#{confirm},
+        mail_user=#{mailUser},
+        mail_before_day=#{mailBeforeDay},
+        mail_frequency=#{mailFrequency},
+        status=#{status},
+        relation=#{relation},
+        update_time= NOW()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateResetRelation">
+        UPDATE bpms_custom_matter SET relation=#{relation} WHERE `type`=#{type} AND `key`=#{key}
+    </update>
+    <update id="updateRelationByIds" parameterType="Integer[]">
+        UPDATE bpms_custom_matter SET relation=1 WHERE id IN
+        <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <update id="updateStatus">
+        UPDATE bpms_custom_matter SET status=#{status} WHERE id=#{id}
+    </update>
+    <delete id="deleteById">
+        DELETE FROM bpms_custom_matter WHERE id = #{id}
+    </delete>
+
+    <select id="findByKeys" resultMap="customMatterResultMap">
+        SELECT
+        t1.*,
+        t2.id rule_id,t2.custom_id rule_custom_id,t2.type rule_type,
+        t2.remind_date rule_remind_date,t2.complete_date rule_complete_date,
+        t2.before_day rule_before_day,t2.complete_before_day rule_complete_before_day,
+        t2.create_time rule_create_time
+        FROM bpms_custom_matter t1 LEFT JOIN bpms_custom_rule t2 ON t1.id=t2.custom_id
+        WHERE t1.status=0
+        <if test="customType != null and customType != ''">
+            AND t1.type=#{customType}
+        </if>
+        <if test="relation != null and relation != ''">
+            AND t1.relation=#{relation}
+        </if>
+        <if test="customKeys != null and customKeys.length>0">
+            AND
+            <foreach collection="customKeys" item="keyItem"  open="(" separator=" OR " close=")">
+                t1.key=#{keyItem}
+            </foreach>
+        </if>
+
+    </select>
+
+</mapper>

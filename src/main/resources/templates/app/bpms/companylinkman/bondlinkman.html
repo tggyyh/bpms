@@ -1,0 +1,62 @@
+
+<div class="wrapper wrapper-content">
+    <div class="row linkman-company-button">
+        <button type="button" id="btnAddLinkman" class="btn btn-w-m btn-warning">新增发行人对接人</button>
+    </div>
+    <div class="row">
+        <table id="tabInfoLinkCompany" class="linkman-table linkman-company-table">
+            <tr class="linkman-header linkman-company-header">
+                <td>姓名</td>
+                <td>电话</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>编辑</td>
+            </tr>
+
+            <tr class="hide">
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanName"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanName" class="form-control" placeholder="姓名" maxlength="64" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanPhone"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanPhone" class="form-control" placeholder="电话" maxlength="32" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanMobile"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanMobile" class="form-control" placeholder="手机" maxlength="11" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanMail"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanMail" class="form-control" placeholder="邮箱" maxlength="64" />
+                    </div>
+                </td>
+                <td>
+                    <input type="hidden" name="hidLinkmanId" />
+                    <div class="linkman-option-view hide">
+                        <span class="linkman-span-option" onclick="editLinkMan(this)">修改</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-edit hide">
+                        <span class="linkman-span-option-s" onclick="updateLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="cancelLinkMan(this)">取消</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-save">
+                        <span class="linkman-span-option-s" onclick="insertLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="removeLinkMan(this)">取消</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/companylinkman/bondlinkman.js}"></script>

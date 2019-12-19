@@ -1,0 +1,46 @@
+
+<script th:src="@{/js/app/bpms/qjprocess/task.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="resumeForm" class="form-horizontal m-t"  enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*申请人：</label>
+                            <div class="col-sm-4">
+                                <input id="taskId" name="taskId" type="hidden" th:value="${taskId}" class="form-control"/>
+                                <input id="applicantName" name="applicantName" type="text" th:value="${applicantName}" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">描述：</label>
+                            <div class="col-sm-6">
+                                <input id="description" name="description" type="text" th:value="${description}" class="form-control"/>
+                            </div>
+                        </div>
+
+                        <div th:if="${checkResult}!=null" class="form-group">
+                            <label class="col-sm-3 control-label">审核结果：</label>
+                            <div th:if="${checkResult}==1" class="col-sm-6">
+                                已通过
+                            </div>
+                            <div th:if="${checkResult}==0" class="col-sm-6">
+                                已拒绝
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-5">
+                                <button id="taskPass" name="taskPass" class="btn btn-info" type="button">通过
+                                </button>
+                                <button id="taskReject" name="taskReject" class="btn btn-info" type="button">拒绝
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

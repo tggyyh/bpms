@@ -1,0 +1,17 @@
+<div th:fragment="top" class="row">
+    <nav class="navbar navbar-static-top  lay-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <span class="navbar-header-span"><img th:src="@{/img/logo.png}"/>&nbsp;&nbsp;天风证券</span>
+        </div>
+        <ul class="nav navbar-top-links navbar-right" style="margin-right: 10px;">
+            <li class="hidden-xs">
+                <div  th:text="${user.accountNumber}"></div>
+            </li>
+            <li>
+                <a th:href="@{/logout}" id="exitSys" class="" data-index="0">
+                    <i class="glyphicon glyphicon-off"></i>退出
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

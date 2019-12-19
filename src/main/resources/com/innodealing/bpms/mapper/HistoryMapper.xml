@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.HistoryMapper">
+
+    <insert id="insertHistory">
+        INSERT INTO bpms_history (user_id, method_name, args, mark,type,template_id,custom_id,bond_code,company_name, create_time, operate_type)
+        VALUES (#{userId}, #{methodName}, #{args}, #{mark},#{type},#{templateId},#{customId},#{bondCode},#{companyName}, NOW(), #{operateType})
+    </insert>
+
+    <select id="findAll" resultType="History">
+        SELECT t1.*,t2.name userName,t4.name roleName
+        FROM bpms_history t1
+        LEFT JOIN sys_user t2 ON t1.user_id=t2.id
+        LEFT JOIN user_role t3 ON t2.id=t3.user_id
+        LEFT JOIN role t4 ON t3.role_id=t4.id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t1.type = #{type}
+        </if>
+        <if test="templateId != null and templateId != ''">
+            AND t1.template_id = #{templateId}
+        </if>
+        <if test="customId != null and customId != ''">
+            AND t1.custom_id = #{customId}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code = #{bondCode}
+        </if>
+        <if test="companyName != null and companyName != ''">
+            AND t1.company_name = #{companyName}
+        </if>
+        ORDER BY
+        <if test="orderby != null and orderby != ''">
+            #{orderby},
+        </if>
+        t1.create_time ASC
+    </select>
+
+</mapper>

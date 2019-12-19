@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.SynUserMapper">
+    <delete id="delete">
+        delete from sys_user
+    </delete>
+    <!--Insert-->
+    <insert id="save">
+        INSERT INTO sys_user (id,tid, name, account_number,password,email,phone,
+        login_status,status,create_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.tid}, #{item.name},
+            #{item.accountNumber}, #{item.password}, #{item.email},
+            #{item.phone}, #{item.loginStatus}, #{item.status},
+            IFNULL(#{item.createTime},NOW()))
+        </foreach>
+    </insert>
+</mapper>

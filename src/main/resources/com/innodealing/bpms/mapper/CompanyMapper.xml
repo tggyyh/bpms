@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CompanyMapper">
+
+    <resultMap id="companyResultMap" type="Company">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="shortname" column="shortname"/>
+        <result property="provinceCode" column="province_code"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="provinceName" column="provinceName"/>
+        <result property="cityName" column="cityName"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+        <result property="proNum1" column="proNum1"/>
+        <result property="proNum2" column="proNum2"/>
+
+        <result property="industryScale" column="industry_scale"/>
+        <result property="economicSector" column="economic_sector"/>
+        <result property="industryType" column="industry_type"/>
+        <result property="industryBigType" column="industry_big_type"/>
+        <result property="economicDepartment" column="economic_department"/>
+        <result property="economicDepartmentDetail" column="economic_department_detail"/>
+        <result property="industryTypeName" column="industry_type_name"/>
+        <result property="industryBigTypeName" column="industry_big_type_name"/>
+        <result property="economicDepartmentName" column="economic_department_name"/>
+        <result property="economicDepartmentDetailName" column="economic_department_detail_name"/>
+        <result property="stockCode" column="stock_code"/>
+        <result property="ratingCompany1" column="rating_company_1"/>
+        <result property="corporateRating1" column="corporate_rating_1"/>
+        <result property="ratingCompany2" column="rating_company_2"/>
+        <result property="corporateRating2" column="corporate_rating_2"/>
+        <result property="corporateOrgCode2" column="corporate_org_code_2"/>
+        <result property="companyCount" column="company_ount" />
+        <result property="matterId" column="matterId" />
+
+
+        <collection property="companyMatterList" ofType="CompanyMatter">
+            <id property="id" column="matter_id"/>
+            <result property="companyName" column="matter_company_name"/>
+            <result property="templateId" column="matter_template_id"/>
+            <result property="status" column="matter_status"/>
+            <result property="createTime" column="matter_create_time"/>
+        </collection>
+
+        <collection property="bondList" ofType="Bond">
+            <id property="id" column="bond_id"/>
+            <result property="code" column="bond_code"/>
+            <result property="name" column="bond_name"/>
+            <result property="shortname" column="bond_shortname"/>
+            <result property="valueDate" column="bond_value_date"/>
+            <result property="listedDate" column="bond_listed_date"/>
+            <result property="currentBalance" column="bond_current_balance"/>
+            <result property="type" column="bond_type"/>
+            <result property="crossMarket" column="bond_cross_market"/>
+            <result property="bondManager" column="bond_manager"/>
+            <result property="underwriterName" column="bond_underwriter_name"/>
+
+        </collection>
+    </resultMap>
+    <delete id="deleteByCompanyName">
+            DELETE FROM bpms.bpms_company where name = #{companyName}
+    </delete>
+
+    <select id="isExist" resultType="int" parameterType="Company">
+        SELECT COUNT(id) tempCount FROM bpms_company WHERE id!=#{id} AND `status`=0 AND `name`=#{name}
+    </select>
+
+    <select id="findAll" resultType="Company">
+        SELECT t1.*,t2.name provinceName,t3.name cityName,t4.proNum1,t4.proNum2,
+        t5.name industry_type_name,t6.name industry_big_type_name,
+        t7.name economic_department_name,t8.name economic_department_detail_name
+        FROM bpms_company t1
+        LEFT JOIN bpms_area t2 ON t1.province_code=t2.code
+        LEFT JOIN bpms_area t3 ON t1.city_code=t3.code
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT tb.company_name,
+            SUM(CASE WHEN tb.`status`=0 THEN 1 ELSE 0 END) proNum1,
+            SUM(CASE WHEN tb.`status`=1 OR tb.`status`=2 THEN 1 ELSE 0 END) proNum2
+            FROM bpms_bond tb JOIN bpms_bond_manager tbpm ON tb.`code`=tbpm.bond_code AND user_id=#{manageruser}
+            WHERE tb.`status`!=4
+            GROUP BY tb.company_name
+            ) t4 ON t1.`name`=t4.company_name
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+        LEFT JOIN (
+            SELECT company_name,
+            SUM(CASE WHEN `status`=0 THEN 1 ELSE 0 END) proNum1,
+            SUM(CASE WHEN `status`=1 OR `status`=2 THEN 1 ELSE 0 END) proNum2
+            FROM bpms_bond WHERE `status`!=4 GROUP BY company_name
+        ) t4 ON t1.`name`=t4.company_name
+        </if>
+        LEFT JOIN bpms_industry t5 ON t1.industry_type=t5.code
+        LEFT JOIN bpms_industry t6 ON t1.industry_big_type=t6.code
+        LEFT JOIN bpms_economic_department t7 ON t1.economic_department=t7.code
+        LEFT JOIN bpms_economic_department t8 ON t1.economic_department_detail=t8.code
+        WHERE t1.status=0
+        <if test="companyname != null and companyname != ''">
+            AND t1.name like '%' #{companyname} '%'
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t1.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t1.city_code =#{cityCode}
+        </if>
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findById" resultType="Company">
+        SELECT t1.*,t2.name provinceName,t3.name cityName,t4.proNum1,t4.proNum2,
+        t5.name industry_type_name,t6.name industry_big_type_name,
+        t7.name economic_department_name,t8.name economic_department_detail_name
+        FROM bpms_company t1
+        LEFT JOIN bpms_area t2 ON t1.province_code=t2.code
+        LEFT JOIN bpms_area t3 ON t1.city_code=t3.code
+        LEFT JOIN (
+            SELECT company_name,
+            SUM(CASE WHEN `status`=0 THEN 1 ELSE 0 END) proNum1,
+            SUM(CASE WHEN `status`=1 OR `status`=2 THEN 1 ELSE 0 END) proNum2
+            FROM bpms_bond WHERE `status`!=4 GROUP BY company_name
+        ) t4 ON t1.`name`=t4.company_name
+        LEFT JOIN bpms_industry t5 ON t1.industry_type=t5.code
+        LEFT JOIN bpms_industry t6 ON t1.industry_big_type=t6.code
+        LEFT JOIN bpms_economic_department t7 ON t1.economic_department=t7.code
+        LEFT JOIN bpms_economic_department t8 ON t1.economic_department_detail=t8.code
+        WHERE t1.status=0 AND t1.id=#{id}
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findByName" resultType="Company">
+        SELECT * FROM bpms_company WHERE status=0 AND name=#{name}
+    </select>
+
+    <insert id="insertCompany" useGeneratedKeys="true" keyProperty="id" parameterType="Company">
+        INSERT INTO bpms_company (
+            `name`,shortname,industry_scale,economic_sector,industry_type,industry_big_type,company_count,
+            economic_department,economic_department_detail,stock_code,province_code,city_code,rating_company_1,
+            corporate_rating_1,rating_company_2,corporate_rating_2,corporate_org_code_2,status,create_time,update_time
+        ) VALUES (
+            #{name},#{shortname},#{industryScale},#{economicSector},#{industryType},#{industryBigType},#{companyCount},
+            #{economicDepartment},#{economicDepartmentDetail},#{stockCode},#{provinceCode},#{cityCode},#{ratingCompany1},
+            #{corporateRating1},#{ratingCompany2},#{corporateRating2},#{corporateOrgCode2},#{status},NOW(),NOW()
+        )
+    </insert>
+
+    <update id="updateStatusById">
+        UPDATE bpms_company SET status=1, update_time=NOW() WHERE id=#{id}
+    </update>
+
+    <update id="updateStatusByIds" parameterType="int[]">
+        UPDATE bpms_company SET status=1, update_time=NOW() WHERE id IN
+        <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <update id="updateCompany" parameterType="Company">
+        UPDATE bpms_company SET
+          `name`=#{name},
+          shortname=#{shortname},
+          industry_scale=#{industryScale},
+          economic_sector=#{economicSector},
+          industry_type=#{industryType},
+          industry_big_type=#{industryBigType},
+          economic_department=#{economicDepartment},
+          economic_department_detail=#{economicDepartmentDetail},
+          stock_code=#{stockCode},
+          province_code=#{provinceCode},
+          city_code=#{cityCode},
+          rating_company_1=#{ratingCompany1},
+          corporate_rating_1=#{corporateRating1},
+          rating_company_2=#{ratingCompany2},
+          corporate_rating_2=#{corporateRating2},
+          corporate_org_code_2=#{corporateOrgCode2},
+          company_count=#{companyCount},
+          status=#{status},
+          create_time=#{createTime},
+          update_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <select id="findLinkMatterCount" resultType="Company">
+        SELECT t1.*,tcm.id matterId
+        FROM bpms_company t1
+        LEFT JOIN (
+          SELECT * FROM bpms_company_matter
+          WHERE template_id=#{templateId} AND status=0
+          GROUP BY template_id,company_name
+        ) tcm ON t1.name=tcm.company_name
+        WHERE t1.status=0
+    </select>
+
+    <select id="findLinkMatterAll" resultType="Company">
+        SELECT
+          t1.*,t2.name provinceName,t3.name cityName,t4.proNum1,t4.proNum2,
+          tcm.id matterId,
+          t5.name industry_type_name,t6.name industry_big_type_name,
+          t7.name economic_department_name,t8.name economic_department_detail_name
+        FROM bpms_company t1
+        LEFT JOIN (
+          SELECT * FROM bpms_company_matter
+          WHERE template_id=#{templateId} AND status=0
+          GROUP BY template_id,company_name
+        ) tcm ON t1.name=tcm.company_name
+        LEFT JOIN bpms_area t2 ON t1.province_code=t2.code
+        LEFT JOIN bpms_area t3 ON t1.city_code=t3.code
+        LEFT JOIN (
+            SELECT company_name,
+            SUM(CASE WHEN `status`=0 THEN 1 ELSE 0 END) proNum1,
+            SUM(CASE WHEN `status`=1 OR `status`=2 THEN 1 ELSE 0 END) proNum2
+            FROM bpms_bond WHERE `status`!=4 GROUP BY company_name
+        ) t4 ON t1.`name`=t4.company_name
+        LEFT JOIN bpms_industry t5 ON t1.industry_type=t5.code
+        LEFT JOIN bpms_industry t6 ON t1.industry_big_type=t6.code
+        LEFT JOIN bpms_economic_department t7 ON t1.economic_department=t7.code
+        LEFT JOIN bpms_economic_department t8 ON t1.economic_department_detail=t8.code
+        WHERE t1.status=0
+        <if test="null != linkman and linkman != '' and linkman== 0">
+            AND tcm.id IS NOT NULL
+        </if>
+        <if test="null != linkman and linkman != '' and linkman== 1">
+            AND tcm.id IS NULL
+        </if>
+        <if test="companyname != null and companyname != ''">
+            AND t1.name like '%' #{companyname} '%'
+        </if>
+        <if test="province != null and province != ''">
+            AND t1.province_code = #{province}
+        </if>
+        <if test="city != null and city != ''">
+            AND t1.city_code = #{city}
+        </if>
+
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findCompLinkAll" resultMap="companyResultMap">
+        SELECT
+            t1.id,t1.name,
+            t2.id bond_id,t2.code bond_code,t2.name bond_name,t2.shortname bond_shortname,t2.value_date bond_value_date,t2.listed_date bond_listed_date,
+            t2.current_balance bond_current_balance,t2.type bond_type,t2.cross_market bond_cross_market,t2.bond_manager,t2.underwriter_name bond_underwriter_name,
+            tcm.matterId,t3.name provinceName,t4.name cityName
+        FROM bpms_company t1 LEFT JOIN bpms_bond t2 ON t1.name=t2.company_name AND t2.status!=4
+        LEFT JOIN (
+            SELECT template_id matterId,company_name FROM bpms_company_matter
+            WHERE template_id=#{templateId} AND status=0
+            GROUP BY template_id,company_name
+        ) tcm ON t1.name=tcm.company_name
+        LEFT JOIN bpms_area t3 ON t1.province_code=t3.code
+        LEFT JOIN bpms_area t4 ON t1.city_code=t4.code
+        WHERE t1.status=0
+        <if test="null != linkman and linkman != '' and linkman== 0">
+            AND tcm.matterId IS NOT NULL
+        </if>
+        <if test="null != linkman and linkman != '' and linkman== 1">
+            AND tcm.matterId IS NULL
+        </if>
+        <if test="companyname != null and companyname != ''">
+            AND t1.name like '%' #{companyname} '%'
+        </if>
+        <if test="province != null and province != ''">
+            AND t1.province_code = #{province}
+        </if>
+        <if test="city != null and city != ''">
+            AND t1.city_code = #{city}
+        </if>
+        <if test="sValueDate != null and sValueDate != ''">
+            AND t2.value_date &gt;= #{sValueDate}
+        </if>
+        <if test="eValueDate != null and eValueDate != ''">
+            AND t2.value_date &lt;= #{eValueDate}
+        </if>
+        <if test="sListedDate != null and sListedDate != ''">
+            AND t2.listed_date &gt;= #{sListedDate}
+        </if>
+        <if test="eListedDate != null and eListedDate != ''">
+            AND t2.listed_date &lt;= #{eListedDate}
+        </if>
+        <if test="sCurrentBalance != null and sCurrentBalance != ''">
+            AND t2.current_balance &gt;= #{sCurrentBalance}
+        </if>
+        <if test="eCurrentBalance != null and eCurrentBalance != ''">
+            AND t2.current_balance &lt;= #{eCurrentBalance}
+        </if>
+        <if test="bondType != null and bondType.size()>0">
+            AND (
+            <foreach item="typeItem" collection="bondType" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, t2.type)
+            </foreach>
+            )
+        </if>
+        <if test="crossMarket != null and crossMarket.size()>0">
+            AND (
+            <foreach item="crossMarketItem" collection="crossMarket" open="(" separator="OR" close=")">
+                find_in_set(#{crossMarketItem}, t2.cross_market)
+            </foreach>
+            )
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t2.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t2.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager != null and bondManager != ''">
+            AND t2.bond_manager like '%' #{bondManager} '%'
+        </if>
+        <if test="underwriterName != null and underwriterName != ''">
+            AND t2.underwriter_name like '%' #{underwriterName} '%'
+        </if>
+
+        ORDER BY t1.create_time DESC
+    </select>
+    <select id="SearchCompanyByName" resultType="Company">
+        SELECT
+        t1.*,
+        tp.`name` provinceName,
+        tc.`name` cityName
+        FROM bpms_company t1
+        LEFT JOIN bpms_area tp ON t1.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t1.city_code=tc.`code`
+        WHERE t1.name = #{companyName} and t1.`status`=0
+    </select>
+</mapper>

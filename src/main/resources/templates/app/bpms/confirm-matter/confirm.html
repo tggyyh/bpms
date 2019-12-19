@@ -1,0 +1,120 @@
+<div th:replace="shared/fuwenben"></div>
+<script th:src="@{/js/app/bpms/confirm-matter/confirm.js}"></script>
+<script th:src="@{/js/common/file.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form id="taskForm" class="form-horizontal m-t"  enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input id="id" name="taskId" type="hidden" th:value="${matterTask.id}" class="form-control"/>
+                            <input id="confirm" name="confirm" type="hidden" th:value="${matterTask.processInfo.confirm}" class="form-control"/>
+                            <input id="type" name="type" type="hidden" th:value="${matterTask.processInfo.type}" class="form-control"/>
+                            <input id="companyName" name="companyName" type="hidden" th:value="${matterTask.processInfo.companyName}" class="form-control"/>
+                            <input id="bondCode" name="bondCode" type="hidden" th:value="${matterTask.processInfo.bondCode}" class="form-control"/>
+                            <input id="bondShortname" name="bondShortname" type="hidden" th:value="${matterTask.processInfo.bondShortname}" class="form-control"/>
+                            <input id="processId" name="processId" type="hidden" th:value="${matterTask.processInfo.processId}" class="form-control"/>
+                            <div class="col-sm-3">
+                                <div class="col-sm-12 td-div-icon" th:text="${matterTask.processInfo.shortname}" th:style="'float:right;background-color:'+${matterTask.processInfo.color}+';border-color:'+${matterTask.processInfo.color}+';'"></div>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <div  style="padding: 6px" id="name" th:text="${matterTask.processInfo.name}"></div>
+                                <div  style="padding: 6px" th:text="${matterTask.processInfo.description}"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">提醒时间：</div>
+                            <span class="col-sm-2" id="remindDate"  name="remindDate" th:text="${#dates.format(matterTask.processInfo.remindDate, 'yyyy-MM-dd')}"/>
+                            <div class="col-sm-2 text-right">需完成时间：</div>
+                            <span class="col-sm-2" id="completeDate" name="completeDate" th:text="${#dates.format(matterTask.processInfo.completeDate, 'yyyy-MM-dd')}"/>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">督导确认：</div>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.confirm}==1">
+                                <span>需要</span>
+                            </div>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.confirm}==0">
+                                <span>不需要</span>
+                            </div>
+                        </div>
+                        <div class="form-group" th:if="null!=${matterTask.processInfo.autoRelate}">
+                            <div class="col-sm-3 text-right">自动关联：</div>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.autoRelate}==1">
+                                <span>是</span>
+                            </div>
+                            <div class="col-sm-3" th:if="${matterTask.processInfo.autoRelate}==0">
+                                <span>否</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">触发通知：</div>
+                            <div class="col-sm-6">
+                                <input id="mailUserHidden" type="hidden" th:value="${matterTask.processInfo.mailUser}"/>
+                                <span id="mailUser" class=""></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">提醒频率：</div>
+                            <div class="col-sm-6">
+                                <span>需完成时间提前</span>
+                                <span style="color:red;" id="mailBeforeDay" th:text="${matterTask.processInfo.mailBeforeDay}"></span>
+                                <span>工作日开始，每隔</span>
+                                <span style="color:red;" id="mailFrequency" th:text="${matterTask.processInfo.mailFrequency}"></span>
+                                <span>工作日  项目负责人仍未提交处理，将再次邮件提醒项目负责人</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right">模板材料：</div>
+                            <div class="col-sm-8 tmp-bgcolor-y">
+                                <span class="fa fa-paperclip tmp-font-20 tmp-padding-5"></span>
+                                <span class="tmp-padding-5">共<span id="spanFileNum"></span>个文件</span>
+                                <span id="fileDownloadAll" class="tmp-link tmp-padding-5">全部下载</span>
+                                <span id="fileRemoveAll" class="tmp-link tmp-font-red tmp-padding-5">全部删除</span>
+                            </div>
+
+                            <div class="col-sm-3"></div>
+                            <div id="tmpFiles" class="col-sm-8" >
+                                <div class="file-list" th:each="attachment : ${matterTask.processInfo.processTemplateAttachmentList}">
+                                    <input type="hidden" name="type" th:value="${attachment.type}"/>
+                                    <input type="hidden" name="name" th:value="${attachment.name}"/>
+                                    <input type="hidden" name="url" th:value="${attachment.url}"/>
+                                    <span class="file-title" th:title="${attachment.name}" th:text="${attachment.name}">
+                                    </span>
+                                    <a class="file-down" onclick="downFile(this)">下载</a>
+                                    <a class="file-remove" onclick="fileRemove(this)">删除</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-8" id="addDiv">
+                                <input id="uploadFile" name="file" multiple="multiple" class="file hide" type="file" onchange="setFile(this)" />
+                                <div id="addFile" class="glyphicon glyphicon-plus-sign tmp-time-plus">
+                                    <span>添加所需材料</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3 text-right"><span class="glyphicon glyphicon-asterisk form-required"></span>事项内容：</div>
+                            <div class="col-sm-8 sub-matter-fuwenben-color">
+                                <div id="summernote"></div>
+                                <input type="hidden" id="hidContent" th:value="${matterTask.processInfo.content}" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-5">
+                                <button id="taskPass" name="taskPass" class="btn btn-info" type="button">提交
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hidField" value="1"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

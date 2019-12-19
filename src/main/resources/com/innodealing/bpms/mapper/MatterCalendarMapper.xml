@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.MatterCalendarMapper">
+
+    <select id="findCalendarData" resultType="MatterCalendar">
+        SELECT
+            IFNULL(t2.id,0) bondId,IFNULL(t3.id,0) companyId,t1.type,t1.company_name,
+            t1.bond_code,t1.bond_shortname,t1.`name` tempName,t1.sub_name,t1.shortname tempShortname,
+            t1.description tempDescription,t1.color,t1.remind_date,t1.complete_date,
+            t1.update_time remindDate1,t1.complete_date completeDate1,t1.`status`,
+            CASE WHEN bsp.order_index>0 THEN 1 ELSE 0 END rightLine,bsp.order_index,0 pageCount
+        FROM bpms_process_info t1 JOIN bpms_survive_process bsp ON t1.process_id=bsp.process_id
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond t2 ON t1.bond_code=t2.`code` AND t2.`status`=0
+            JOIN (
+                SELECT TBM1.bond_code, GROUP_CONCAT(TBM1.user_id) user_id
+                FROM bpms_bond_manager TBM1 JOIN (
+                  SELECT * FROM bpms_bond_manager WHERE user_id=#{manageruser}
+                ) TBM2 ON TBM1.bond_code=TBM2.bond_code
+                GROUP BY TBM1.bond_code
+            ) t4 ON t2.code=t4.bond_code
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+            LEFT JOIN bpms_bond t2 ON t1.bond_code=t2.`code` AND t2.`status`=0
+            LEFT JOIN (
+              SELECT bond_code, GROUP_CONCAT(user_id) user_id FROM bpms_bond_manager GROUP BY bond_code
+            ) t4 ON t2.code=t4.bond_code
+        </if>
+        LEFT JOIN bpms_company t3 ON t1.company_name=t3.`name` AND t3.`status`=0
+        LEFT JOIN bpms_area tp ON t3.province_code=tp.`code`
+        LEFT JOIN bpms_area tc ON t3.city_code=tc.`code`
+        WHERE t1.status &lt;= 64
+        <if test="tempname != null and tempname != ''">
+            AND t1.`name` like '%' #{tempname} '%'
+        </if>
+        <if test="stime != null and stime != ''">
+            AND DATE(t1.update_time) &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND DATE(t1.update_time) &lt;= #{etime}
+        </if>
+        <if test="matterType != null and matterType != ''">
+            AND t1.type = #{matterType}
+        </if>
+        <if test="completeDate != null and completeDate != ''">
+            AND DATE(t1.complete_date) = #{completeDate}
+        </if>
+        <if test="provinceCode != null and provinceCode != ''">
+            AND t3.province_code =#{provinceCode}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND t3.city_code =#{cityCode}
+        </if>
+        <if test="listedPlace != null and listedPlace.size()>0">
+            AND (
+            <foreach item="placeItem" collection="listedPlace" open="(" separator="OR" close=")">
+                find_in_set(#{placeItem}, REPLACE(t2.listed_place,';',','))
+            </foreach>
+            )
+        </if>
+        <if test="type != null and type.size()>0">
+            AND (
+            <foreach item="typeItem" collection="type" open="(" separator="OR" close=")">
+                find_in_set(#{typeItem}, t2.type)
+            </foreach>
+            )
+        </if>
+        <if test="userId != null and userId.size()>0">
+            AND (
+            <foreach item="userIdItem" collection="userId" open="(" separator="OR" close=")">
+                find_in_set(#{userIdItem}, t4.user_id)
+            </foreach>
+            )
+        </if>
+
+        <if test="timeLimitBegin != null and timeLimitBegin != ''">
+            AND t2.time_Limit &gt;= #{timeLimitBegin}
+        </if>
+        <if test="timeLimitEnd != null and timeLimitEnd != ''">
+            AND t2.time_Limit &lt;= #{timeLimitEnd}
+        </if>
+        <if test="valueDateBegin != null and valueDateBegin != ''">
+            AND t2.value_date &gt;= #{valueDateBegin}
+        </if>
+        <if test="valueDateEnd != null and valueDateEnd != ''">
+            AND t2.value_date &lt;= #{valueDateEnd}
+        </if>
+        <if test="payDayBegin != null and payDayBegin != ''">
+            AND DATE_FORMAT(t2.pay_day,'%Y') &gt;= #{payDayBegin}
+        </if>
+        <if test="payDayEnd != null and payDayEnd != ''">
+            AND DATE_FORMAT(t2.pay_day,'%Y') &lt;= #{payDayEnd}
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany =="无"'>
+            AND (IFNULL(t2.guarantee_company_1,'')='' OR t2.guarantee_company_1='无' OR IFNULL(t2.guarantee_company_2,'')='' OR t2.guarantee_company_2='无')
+        </if>
+        <if test='guaranteeCompany !=null and guaranteeCompany !="" and guaranteeCompany !="无"'>
+            AND (t2.guarantee_company_1 LIKE '%' #{guaranteeCompany} '%' OR t2.guarantee_company_2 LIKE '%' #{guaranteeCompany} '%')
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 0">
+            AND t2.bond_manager like '%天风%'
+        </if>
+        <if test="managerType != null and managerType != '' and managerType == 1">
+            AND t2.bond_manager not like '%天风%'
+        </if>
+        <if test="bondManager !=null and bondManager !=''">
+            AND t2.bond_manager LIKE '%' #{bondManager} '%'
+        </if>
+        ORDER BY t1.update_time DESC
+    </select>
+
+    <select id="findMonthProcessDate" resultType="MatterCalendarDate">
+        <choose>
+            <when test="manageruser != null and manageruser != ''">
+                <if test="type == null or type == ''">
+                    SELECT DISTINCT(t1.complete_date) calendarDate
+                    FROM bpms_process_info t1
+                    JOIN bpms_bond t2 ON t1.company_name=t2.company_name
+                    JOIN bpms_bond_manager t3 ON t2.code=t3.bond_code AND t3.user_id=user_id=#{manageruser}
+                    WHERE t1.type=0 AND t1.complete_date BETWEEN #{stime} AND #{etime} AND t1.status &lt; 32
+                    <if test="status != null and status == 2">
+                        AND t1.status=1
+                    </if>
+                    <if test="status != null and status == 3">
+                        AND (t1.status=2 OR t1.status=8)
+                    </if>
+                    <if test="status != null and status == 4">
+                        AND (t1.status=4 OR t1.status=16)
+                    </if>
+                    GROUP BY t1.complete_date
+                    UNION
+                    SELECT DISTINCT(t1.complete_date) calendarDate
+                    FROM bpms_process_info t1
+                    JOIN bpms_bond t2 ON t1.bond_code=t2.code
+                    JOIN bpms_bond_manager t3 ON t2.code=t3.bond_code AND user_id=#{manageruser}
+                    WHERE t1.type=1 AND t1.complete_date BETWEEN #{stime} AND #{etime} AND t1.status &lt; 32
+                    <if test="status != null and status == 2">
+                        AND t1.status=1
+                    </if>
+                    <if test="status != null and status == 3">
+                        AND (t1.status=2 OR t1.status=8)
+                    </if>
+                    <if test="status != null and status == 4">
+                        AND (t1.status=4 OR t1.status=16)
+                    </if>
+                    GROUP BY t1.complete_date
+                </if>
+                <if test="type != null and type != '' and type == 0">
+                    SELECT DISTINCT(t1.complete_date) calendarDate
+                    FROM bpms_process_info t1
+                    JOIN bpms_bond t2 ON t1.company_name=t2.company_name
+                    JOIN bpms_bond_manager t3 ON t2.code=t3.bond_code AND t3.user_id=user_id=#{manageruser}
+                    WHERE t1.type=0 AND t1.complete_date BETWEEN #{stime} AND #{etime} AND t1.status &lt; 32
+                    <if test="status != null and status == 2">
+                        AND t1.status=1
+                    </if>
+                    <if test="status != null and status == 3">
+                        AND (t1.status=2 OR t1.status=8)
+                    </if>
+                    <if test="status != null and status == 4">
+                        AND (t1.status=4 OR t1.status=16)
+                    </if>
+                    GROUP BY t1.complete_date
+                </if>
+                <if test="type != null and type != '' and type == 1">
+                    SELECT DISTINCT(t1.complete_date) calendarDate
+                    FROM bpms_process_info t1
+                    JOIN bpms_bond t2 ON t1.bond_code=t2.code
+                    JOIN bpms_bond_manager t3 ON t2.code=t3.bond_code AND user_id=#{manageruser}
+                    WHERE t1.type=1 AND t1.complete_date BETWEEN #{stime} AND #{etime} AND t1.status &lt; 32
+                    <if test="status != null and status == 2">
+                        AND t1.status=1
+                    </if>
+                    <if test="status != null and status == 3">
+                        AND (t1.status=2 OR t1.status=8)
+                    </if>
+                    <if test="status != null and status == 4">
+                        AND (t1.status=4 OR t1.status=16)
+                    </if>
+                    GROUP BY t1.complete_date
+                </if>
+            </when>
+            <when test="manageruser == null or manageruser == ''">
+                SELECT DISTINCT(t1.complete_date) calendarDate
+                FROM bpms_process_info t1
+                WHERE t1.complete_date BETWEEN #{stime} AND #{etime} AND t1.status &lt; 32
+                <if test="status != null and status == 2">
+                    AND t1.status=1
+                </if>
+                <if test="status != null and status == 3">
+                    AND (t1.status=2 OR t1.status=8)
+                </if>
+                <if test="status != null and status == 4">
+                    AND (t1.status=4 OR t1.status=16)
+                </if>
+                <if test="type != null and type != ''">
+                    AND type=#{type}
+                </if>
+                GROUP BY complete_date
+            </when>
+        </choose>
+    </select>
+
+    <select id="findMonthCompleteMatter" resultType="MatterCalendar">
+
+        SELECT
+        t1.id,0 type,t1.id companyId,t1.`name` company_name,
+        0 bondId,'' bondCode,'' bondShortname,0 payFrequency, t4.complete_date payDay,t4.complete_date valueDate,
+        t3.id tempId,0 custTempId,t3.`name` tempName,t3.shortname tempShortname,t3.description tempDescription,t3.color,
+        t4.id rule_id,t4.type ruleType,t4.remind_date,t4.before_day remindBeforeDay,t4.complete_date,t4.complete_before_day,0 `status`,
+        0 right_line,0 order_index,'' subName,
+        t3.`name` nowTempName,t3.shortname nowTempShortname,t3.description nowTempDescription,t3.color nowTempColor
+        FROM bpms_company t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+                SELECT a.company_name
+                FROM bpms_bond a JOIN bpms_bond_manager b ON a.code=b.bond_code AND b.user_id=#{manageruser}
+            ) tbc ON t1.name=tbc.company_name
+        </if>
+        JOIN bpms_company_matter t2 ON t1.`name`=t2.company_name AND t1.`status`=0 AND t2.`status`=0
+        JOIN bpms_matter_template t3 ON t2.template_id=t3.id AND t3.`status`=0
+        JOIN bpms_template_rule t4 ON t3.id=t4.template_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t3.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,0 type,t1.id companyId,t1.`name` company_name,
+        0 bondId,'' bondCode,'' bondShortname,0 payFrequency, t3.complete_date payDay,t3.complete_date valueDate,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,t3.remind_date,t3.before_day remindBeforeDay,t3.complete_date,t3.complete_before_day,0 `status`,
+        t2.right_line,0 order_index,'' subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_company t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT a.company_name
+            FROM bpms_bond a JOIN bpms_bond_manager b ON a.code=b.bond_code AND b.user_id=#{manageruser}
+            ) tbc ON t1.name=tbc.company_name
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=0 AND t1.`name`=t2.`key`AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        t3.id tempId,0 custTempId,t3.`name` tempName,t3.shortname tempShortname,t3.description tempDescription,t3.color,
+        t4.id rule_id,t4.type ruleType,t4.remind_date,t4.before_day remindBeforeDay,t4.complete_date,t4.complete_before_day,0 `status`,
+        0 right_line,0 order_index,'' subName,
+        t3.`name` nowTempName,t3.shortname nowTempShortname,t3.description nowTempDescription,t3.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_bond_matter t2 ON t1.`code`=t2.bond_code AND t1.`status`=0 AND t2.`status`=0
+        JOIN bpms_matter_template t3 ON t2.template_id=t3.id AND t3.`status`=0
+        JOIN bpms_template_rule t4 ON t3.id=t4.template_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t3.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,t3.remind_date,t3.before_day remindBeforeDay,t3.complete_date,t3.complete_before_day,0 `status`,
+        t2.right_line,0 order_index,'' subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=1 AND t1.`code`=t2.`key` AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1 AND t2.right_line=0
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,
+        t3.remind_date,t4.before_day remindBeforeDay,t3.complete_date,t4.complete_before_day,0 `status`,
+        t2.right_line,t4.order_index,t4.name subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=1 AND t1.`code`=t2.`key` AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1 AND t2.right_line=1
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        JOIN bpms_custom_sub_matter t4 ON t2.id=t4.custom_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+    </select>
+
+    <select id="findProcessDay" resultType="MatterCalendar">
+        SELECT
+        a1.id,a1.type,IFNULL(bc.id,0) companyId,a1.company_name,
+        IFNULL(bb.id,0) bondId,a1.bond_code,a1.bond_shortname,bb.pay_frequency,bb.pay_day,bb.value_date,
+        a2.template_id tempId,a2.custom_id custTempId,a1.`name` tempName,a2.rule_id,
+        CASE WHEN a2.order_index>0 THEN 1 ELSE 0 END rightLine,
+        a1.sub_name,a1.shortname tempShortname,a1.description tempDescription,a1.color,a1.remind_date,a1.complete_date,
+        a1.remind_date remindDate1,a1.complete_date completeDate1,a2.order_index,a1.`status`,
+        IFNULL(mt.`name`,a1.`name`) nowTempName,IFNULL(mt.shortname,a1.shortname) nowTempShortname,
+        IFNULL(mt.description,a1.description) nowTempDescription,IFNULL(mt.color,a1.color) nowTempColor
+        FROM bpms_process_info a1 JOIN bpms_survive_process a2 ON a1.process_id=a2.process_id
+        <if test="manageruser != null and manageruser != ''">
+            LEFT JOIN (
+                SELECT tcompany.*
+                FROM bpms_company tcompany JOIN bpms_bond tbond ON tcompany.name=tbond.company_name
+                JOIN bpms_bond_manager tmanager ON tbond.code=tmanager.bond_code AND tmanager.user_id=#{manageruser}
+            ) bc ON a1.company_name=bc.`name` AND bc.`status`=0
+            LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+            JOIN bpms_bond_manager tbm ON bb.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+        LEFT JOIN bpms_company bc ON a1.company_name=bc.`name` AND bc.`status`=0
+        LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+        </if>
+        LEFT JOIN bpms_matter_template mt ON a2.template_id=mt.id AND mt.`status`=0
+        WHERE a1.status &lt;= 64
+        <if test="type != null and type != ''">
+            AND a1.type=#{type}
+        </if>
+        <if test="completeDate != null and completeDate != ''">
+            AND a1.complete_date=#{completeDate}
+        </if>
+        <if test="remindDate != null and remindDate != ''">
+            AND a1.remind_date=#{remindDate}
+        </if>
+
+        ORDER BY a1.update_time DESC
+    </select>
+
+    <select id="findMonthRemindProcess" resultType="MatterCalendar">
+        SELECT
+        a1.id,a1.type,IFNULL(bc.id,0) companyId,a1.company_name,
+        IFNULL(bb.id,0) bondId,a1.bond_code,a1.bond_shortname,bb.pay_frequency,bb.pay_day,bb.value_date,
+        a2.template_id tempId,a2.custom_id custTempId,a1.`name` tempName,a2.rule_id,
+        CASE WHEN a2.order_index>0 THEN 1 ELSE 0 END rightLine,
+        a1.sub_name,a1.shortname tempShortname,a1.description tempDescription,a1.color,a1.remind_date,a1.complete_date,
+        a1.remind_date remindDate1,a1.complete_date completeDate1,a2.order_index,a1.`status`,
+        IFNULL(mt.`name`,a1.`name`) nowTempName,IFNULL(mt.shortname,a1.shortname) nowTempShortname,
+        IFNULL(mt.description,a1.description) nowTempDescription,IFNULL(mt.color,a1.color) nowTempColor
+        FROM bpms_process_info a1 JOIN bpms_survive_process a2 ON a1.process_id=a2.process_id
+        <if test="manageruser != null and manageruser != ''">
+            LEFT JOIN (
+            SELECT tcompany.*
+            FROM bpms_company tcompany JOIN bpms_bond tbond ON tcompany.name=tbond.company_name
+            JOIN bpms_bond_manager tmanager ON tbond.code=tmanager.bond_code AND tmanager.user_id=#{manageruser}
+            ) bc ON a1.company_name=bc.`name` AND bc.`status`=0
+            LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+            JOIN bpms_bond_manager tbm ON bb.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+            LEFT JOIN bpms_company bc ON a1.company_name=bc.`name` AND bc.`status`=0
+            LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+        </if>
+        LEFT JOIN bpms_matter_template mt ON a2.template_id=mt.id AND mt.`status`=0
+        WHERE a1.status &lt;= 64
+        <if test="type != null and type != ''">
+            AND a1.type=#{type}
+        </if>
+        <if test="stime != null and stime != ''">
+            AND a1.remind_date &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND a1.remind_date &lt;= #{etime}
+        </if>
+
+        ORDER BY a1.update_time DESC
+    </select>
+
+    <select id="findMonthRemindMatter" resultType="MatterCalendar">
+
+        SELECT
+        t1.id,0 type,t1.id companyId,t1.`name` company_name,
+        0 bondId,'' bondCode,'' bondShortname,0 payFrequency, t4.complete_date payDay,t4.complete_date valueDate,
+        t3.id tempId,0 custTempId,t3.`name` tempName,t3.shortname tempShortname,t3.description tempDescription,t3.color,
+        t4.id rule_id,t4.type ruleType,t4.remind_date,t4.before_day remindBeforeDay,t4.complete_date,t4.complete_before_day,t3.confirm `status`,
+        0 right_line,0 order_index,'' subName,
+        t3.`name` nowTempName,t3.shortname nowTempShortname,t3.description nowTempDescription,t3.color nowTempColor
+        FROM bpms_company t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT a.company_name
+            FROM bpms_bond a JOIN bpms_bond_manager b ON a.code=b.bond_code AND b.user_id=#{manageruser}
+            ) tbc ON t1.name=tbc.company_name
+        </if>
+        JOIN bpms_company_matter t2 ON t1.`name`=t2.company_name AND t1.`status`=0 AND t2.`status`=0
+        JOIN bpms_matter_template t3 ON t2.template_id=t3.id AND t3.`status`=0
+        JOIN bpms_template_rule t4 ON t3.id=t4.template_id
+        <if test="status != null and status != ''">
+            AND t3.confirm=#{status}
+        </if>
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t3.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,0 type,t1.id companyId,t1.`name` company_name,
+        0 bondId,'' bondCode,'' bondShortname,0 payFrequency, t3.complete_date payDay,t3.complete_date valueDate,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,t3.remind_date,t3.before_day remindBeforeDay,t3.complete_date,t3.complete_before_day,t2.confirm `status`,
+        t2.right_line,0 order_index,'' subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_company t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN (
+            SELECT a.company_name
+            FROM bpms_bond a JOIN bpms_bond_manager b ON a.code=b.bond_code AND b.user_id=#{manageruser}
+            ) tbc ON t1.name=tbc.company_name
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=0 AND t1.`name`=t2.`key`AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1 AND t2.right_line=0
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        <if test="status != null and status != ''">
+            AND t2.confirm=#{status}
+        </if>
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        t3.id tempId,0 custTempId,t3.`name` tempName,t3.shortname tempShortname,t3.description tempDescription,t3.color,
+        t4.id rule_id,t4.type ruleType,t4.remind_date,t4.before_day remindBeforeDay,t4.complete_date,t4.complete_before_day,t3.confirm `status`,
+        0 right_line,0 order_index,'' subName,
+        t3.`name` nowTempName,t3.shortname nowTempShortname,t3.description nowTempDescription,t3.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_bond_matter t2 ON t1.`code`=t2.bond_code AND t1.`status`=0 AND t2.`status`=0
+        JOIN bpms_matter_template t3 ON t2.template_id=t3.id AND t3.`status`=0
+        JOIN bpms_template_rule t4 ON t3.id=t4.template_id
+        <if test="status != null and status != ''">
+            AND t3.confirm=#{status}
+        </if>
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t3.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,t3.remind_date,t3.before_day remindBeforeDay,t3.complete_date,t3.complete_before_day,t2.confirm `status`,
+        t2.right_line,0 order_index,'' subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=1 AND t1.`code`=t2.`key` AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1 AND t2.right_line=0
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        <if test="status != null and status != ''">
+            AND t2.confirm=#{status}
+        </if>
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,1 type,0 companyId,t1.company_name,
+        t1.id bondId,t1.`code` bondCode,t1.shortname bondShortname,t1.pay_frequency,t1.pay_day,t1.value_date,
+        0 tempId,t2.id custTempId,t2.`name` tempName,t2.shortname tempShortname,t2.description tempDescription,t2.color,
+        t3.id rule_id,t3.type ruleType,
+        t3.remind_date,t4.before_day remindBeforeDay,t3.complete_date,t4.complete_before_day,t2.confirm `status`,
+        t2.right_line,t4.order_index,t4.name subName,
+        t2.`name` nowTempName,t2.shortname nowTempShortname,t2.description nowTempDescription,t2.color nowTempColor
+        FROM bpms_bond t1
+        <if test="manageruser != null and manageruser != ''">
+            JOIN bpms_bond_manager tbm ON t1.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        JOIN bpms_custom_matter t2 ON t2.type=1 AND t1.`code`=t2.`key` AND t1.`status`=0 AND t2.`status`=0 AND t2.relation=1 AND t2.right_line=1
+        JOIN bpms_custom_rule t3 ON t2.id=t3.custom_id
+        JOIN bpms_custom_sub_matter t4 ON t2.id=t4.custom_id
+        <if test="status != null and status != ''">
+            AND t2.confirm=#{status}
+        </if>
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND t2.type=#{type}
+        </if>
+    </select>
+
+    <select id="findProcessCompleteData" resultType="MatterCalendar">
+        SELECT
+        a1.id,a1.type,IFNULL(bc.id,0) companyId,a1.company_name,
+        IFNULL(bb.id,0) bondId,a1.bond_code,a1.bond_shortname,bb.pay_frequency,bb.pay_day,bb.value_date,
+        a2.template_id tempId,a2.custom_id custTempId,a1.`name` tempName,a2.rule_id,
+        CASE WHEN a2.order_index>0 THEN 1 ELSE 0 END rightLine,
+        a1.sub_name,a1.shortname tempShortname,a1.description tempDescription,a1.color,a1.remind_date,a1.complete_date,
+        a1.remind_date remindDate1,a1.complete_date completeDate1,a2.order_index,a1.`status`,
+        IFNULL(mt.`name`,a1.`name`) nowTempName,IFNULL(mt.shortname,a1.shortname) nowTempShortname,
+        IFNULL(mt.description,a1.description) nowTempDescription,IFNULL(mt.color,a1.color) nowTempColor
+        FROM bpms_process_info a1 JOIN bpms_survive_process a2 ON a1.process_id=a2.process_id
+        <if test="manageruser != null and manageruser != ''">
+            LEFT JOIN (
+            SELECT tcompany.*
+            FROM bpms_company tcompany JOIN bpms_bond tbond ON tcompany.name=tbond.company_name
+            JOIN bpms_bond_manager tmanager ON tbond.code=tmanager.bond_code AND tmanager.user_id=#{manageruser}
+            ) bc ON a1.company_name=bc.`name` AND bc.`status`=0
+            LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+            JOIN bpms_bond_manager tbm ON bb.code=tbm.bond_code AND tbm.user_id=#{manageruser}
+        </if>
+        <if test="manageruser == null or manageruser == ''">
+            LEFT JOIN bpms_company bc ON a1.company_name=bc.`name` AND bc.`status`=0
+            LEFT JOIN bpms_bond bb ON a1.bond_code=bb.`code` AND bb.`status`=0
+        </if>
+        LEFT JOIN bpms_matter_template mt ON a2.template_id=mt.id AND mt.`status`=0
+        WHERE a1.status &gt;= 32
+        <if test="stime != null and stime != ''">
+            AND a1.complete_date &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND a1.complete_date &lt;= #{etime}
+        </if>
+
+        ORDER BY a1.update_time DESC
+    </select>
+
+</mapper>

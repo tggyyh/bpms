@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CompanyMatterMapper">
+
+    <resultMap id="companyMatterResultMap" type="CompanyMatter">
+        <result property="id" column="id"/>
+        <result property="companyName" column="company_name"/>
+        <result property="templateId" column="template_id"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+
+        <collection property="matterTemplate" ofType="MatterTemplate">
+            <id property="id" column="id"/>
+            <result property="type" column="type"/>
+            <result property="name" column="name"/>
+            <result property="shortname" column="shortname"/>
+            <result property="description" column="description"/>
+            <result property="color" column="color"/>
+            <result property="content" column="content"/>
+            <result property="confirm" column="confirm"/>
+            <result property="mailUser" column="mail_user"/>
+            <result property="mailBeforeDay" column="mail_before_day"/>
+            <result property="mailFrequency" column="mail_frequency"/>
+            <result property="status" column="status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+        </collection>
+    </resultMap>
+
+    <!--Insert-->
+    <insert id="insertCompanyMatter" useGeneratedKeys="true" keyProperty="id" parameterType="CompanyMatter">
+        INSERT INTO bpms_company_matter (company_name, template_id, `status`)
+        VALUES (#{companyName}, #{templateId}, #{status})
+    </insert>
+
+    <insert id="insertCompanyMatterList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_company_matter (company_name, template_id, `status`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.companyName}, #{item.templateId}, #{item.status})
+        </foreach>
+    </insert>
+
+    <select id="findByCompany" resultType="CompanyMatter">
+        SELECT t1.*,'' templateName
+        FROM bpms_company_matter t1
+        JOIN bpms_company t2 ON t1.company_name=t2.name
+        WHERE t1.`status`=0 AND t2.`status`=0
+        <if test="companyId != null and companyId != ''">
+            AND t2.id=#{companyId}
+        </if>
+        <if test="companyName != null and companyName != ''">
+            AND t2.name=#{companyName}
+        </if>
+        <if test="matterType != null and matterType != ''">
+            AND t2.type=#{matterType})
+        </if>
+
+    </select>
+
+    <select id="findByCompanyNames" resultMap="companyMatterResultMap">
+        SELECT t1.*,t2.*
+        FROM bpms_company_matter t1
+        LEFT JOIN bpms_matter_template t2 ON t1.template_id=t2.id
+        WHERE t1.`status`=0 AND t2.`status`=0
+        <if test="companyNames != null and companyNames.length>0">
+            AND
+            <foreach collection="companyNames" item="nameItem"  open="(" separator=" OR " close=")">
+                t1.company_name=#{nameItem}
+            </foreach>
+        </if>
+        <if test="matterType != null and matterType != ''">
+            AND t2.type=#{matterType}
+        </if>
+    </select>
+
+    <update id="updateStatusByTemplateId">
+        UPDATE bpms_company_matter SET status=1 WHERE template_id=#{templateId}
+    </update>
+
+    <update id="updateStatusByCompanyName">
+        UPDATE bpms_company_matter SET status=1 WHERE company_name=#{companyName}
+    </update>
+    <update id="updateCompanyName">
+        UPDATE bpms_company_matter SET company_name = #{companyName} where company_name = #{sname}
+    </update>
+
+    <delete id="deleteByCompanyName">
+        DELETE FROM bpms_company_matter WHERE company_name=#{companyName}
+    </delete>
+
+    <delete id="deleteLinkMan" parameterType="CompanyMatter">
+        DELETE FROM bpms_company_matter WHERE company_name=#{companyName} AND template_id=#{templateId}
+    </delete>
+
+    <delete id="deleteByCompanyIds" parameterType="int[]">
+        DELETE t1
+        FROM bpms_company_matter t1
+        LEFT JOIN bpms_company t2 ON t1.company_name=t2.name
+        WHERE t2.id IN
+        <foreach item="idItem" collection="array" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByMatterList" parameterType="java.util.Map">
+        DELETE FROM bpms_company_matter WHERE template_id=#{map.templateId} AND company_name IN
+        <if test="map.companynames != null and map.companynames.length>0">
+            <foreach collection="map.companynames" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="findByTemplateId" resultType="CompanyMatter">
+        SELECT *
+        FROM bpms_company_matter
+        WHERE template_id=#{templateId} AND `status`=0
+    </select>
+
+    <delete id="deleteByTemplateId">
+        DELETE FROM bpms_company_matter WHERE template_id=#{templateId}
+    </delete>
+
+    <insert id="insertByTemplateId" parameterType="int">
+        INSERT INTO bpms_company_matter (company_name, template_id, `status`)
+        SELECT name,#{templateId},0 FROM bpms_company WHERE `status`=0
+    </insert>
+
+    <insert id="insertByCompanyName">
+        INSERT INTO bpms_company_matter (company_name, template_id, `status`)
+        SELECT #{companyName},id,0 FROM bpms_matter_template WHERE type=0 AND `status`=0 AND auto_relate=1
+    </insert>
+</mapper>

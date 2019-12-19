@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.CustomRuleMapper">
+
+    <!--Insert-->
+    <insert id="insertCustomRule" useGeneratedKeys="true" keyProperty="id" parameterType="CustomRule">
+        INSERT INTO bpms_custom_rule (custom_id, `type`, remind_date, complete_date, before_day, complete_before_day, create_time)
+        VALUES (#{customId}, #{type}, #{remindDate}, #{completeDate}, #{beforeDay}, #{completeBeforeDay}, NOW())
+    </insert>
+
+    <insert id="insertCustomRuleList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        INSERT INTO bpms_custom_rule (custom_id, `type`, remind_date, complete_date, before_day, complete_before_day, create_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.customId}, #{item.type}, #{item.remindDate}, #{item.completeDate}, #{item.beforeDay}, #{item.completeBeforeDay}, NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteByCustomId">
+        DELETE FROM bpms_custom_rule WHERE custom_id = #{customId}
+    </delete>
+
+    <update id="updateCustomRuleList"  parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE bpms_custom_rule
+            <set>
+                custom_id = #{item.customId},
+                type = #{item.type},
+                remind_date = #{item.remindDate},
+                complete_date = #{item.completeDate},
+                before_day = #{item.beforeDay},
+                complete_before_day = #{item.completeBeforeDay}
+            </set>
+            WHERE id=#{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteByIds" parameterType="java.util.Map">
+        DELETE FROM bpms_custom_rule WHERE custom_id=#{map.customId}
+        <if test="map.ids != null and map.ids.length>0">
+            AND id NOT IN
+            <foreach collection="map.ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

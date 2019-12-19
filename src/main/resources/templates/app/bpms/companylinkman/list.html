@@ -1,0 +1,107 @@
+
+<div class="wrapper wrapper-content">
+    <div class="row linkman-company-button">
+        <shiro:hasPermission name="project-manage:edit">
+        <button type="button" id="btnAddLinkman" class="btn btn-w-m btn-warning">新增发行人对接人</button>
+        </shiro:hasPermission>
+    </div>
+    <div class="row">
+        <table id="tabInfoLinkCompany" class="linkman-table linkman-company-table">
+            <tr class="linkman-header linkman-company-header">
+                <td>姓名</td>
+                <td>电话</td>
+                <td>手机</td>
+                <td>邮箱</td>
+                <td>编辑</td>
+            </tr>
+            <tr th:each="linkman,linkmanStat:${companyLinkmanList}">
+                <td>
+                    <div class="linkman-view" name="divLinkmanName" th:text="${linkman.name}"></div>
+                    <div class="linkman-edit hide">
+                        <input type="text" name="txtLinkmanName" class="form-control" th:value="${linkman.name}" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view" name="divLinkmanPhone" th:text="${linkman.phone}"></div>
+                    <div class="linkman-edit hide">
+                        <input type="text" name="txtLinkmanPhone" class="form-control" th:value="${linkman.phone}" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view" name="divLinkmanMobile" th:text="${linkman.mobile}"></div>
+                    <div class="linkman-edit hide">
+                        <input type="text" name="txtLinkmanMobile" class="form-control" th:value="${linkman.mobile}" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view" name="divLinkmanMail" th:text="${linkman.mail}"></div>
+                    <div class="linkman-edit hide">
+                        <input type="text" name="txtLinkmanMail" class="form-control" th:value="${linkman.Mail}" />
+                    </div>
+                </td>
+                <td>
+                    <input type="hidden" name="hidLinkmanId" th:value="${linkman.id}"/>
+                    <shiro:hasPermission name="project-manage:edit">
+                    <div class="linkman-option-view">
+                        <span class="linkman-span-option" onclick="editLinkMan(this)">修改</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-edit hide">
+                        <span class="linkman-span-option-s" onclick="updateLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="cancelLinkMan(this)">取消</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-save hide">
+                        <span class="linkman-span-option-s" onclick="insertLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="removeLinkMan(this)">取消</span>
+                    </div>
+                    </shiro:hasPermission>
+                </td>
+            </tr>
+            <tr class="hide">
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanName"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanName" class="form-control" placeholder="姓名" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanPhone"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanPhone" class="form-control" placeholder="电话" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanMobile"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanMobile" class="form-control" placeholder="手机" />
+                    </div>
+                </td>
+                <td>
+                    <div class="linkman-view hide" name="divLinkmanMail"></div>
+                    <div class="linkman-edit">
+                        <input type="text" name="txtLinkmanMail" class="form-control" placeholder="邮箱" />
+                    </div>
+                </td>
+                <td>
+                    <input type="hidden" name="hidLinkmanId" />
+                    <div class="linkman-option-view hide">
+                        <span class="linkman-span-option" onclick="editLinkMan(this)">修改</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-edit hide">
+                        <span class="linkman-span-option-s" onclick="updateLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="cancelLinkMan(this)">取消</span>
+                        <span class="linkman-span-option-d" onclick="deleteLinkMan(this)">删除</span>
+                    </div>
+                    <div class="linkman-option-save">
+                        <span class="linkman-span-option-s" onclick="insertLinkMan(this)">保存</span>
+                        <span class="linkman-span-option" onclick="removeLinkMan(this)">取消</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/companylinkman/list.js}"></script>

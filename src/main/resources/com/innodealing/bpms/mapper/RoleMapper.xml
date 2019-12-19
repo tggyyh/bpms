@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.RoleMapper">
+    <select id="findAll" resultType="Role">
+        SELECT * FROM role ORDER BY create_time ASC
+    </select>
+    <select id="findById" resultType="Role">
+        SELECT * from role where id=#{id}
+    </select>
+    <select id="findByIds" resultType="Role">
+        SELECT * from role where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findByPage" parameterType="ReqData" resultType="Role">
+        SELECT * from role
+        ORDER BY create_time ASC
+    </select>
+    <!--Insert-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="Role">
+        INSERT INTO role (`name`, code, description)
+        VALUES (#{name}, #{code}, #{description})
+    </insert>
+    <!--Update-->
+    <update id="update" parameterType="Role">
+        UPDATE role SET
+        `name`=#{name},
+        code=#{code},
+        description=#{description},
+        update_time=Now()
+        WHERE id=#{id}
+    </update>
+    <delete id="delete">
+        delete from role WHERE id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRolePremissionByRoleIds">
+        delete from role_permission WHERE role_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRolePremissionByRoleId">
+        delete from role_permission WHERE role_id=#{roleId}
+    </delete>
+    <!--Insert-->
+    <insert id="insertRolePremission" parameterType="java.util.Map"  >
+        <foreach collection="permissionIds" index="index" item="item" open="" separator=";" close="">
+            INSERT INTO role_permission (`role_id`, permission_id) values (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="findByUser" resultType="string">
+      SELECT r.code FROM sys_user su LEFT JOIN role r ON su.role_id = r.id WHERE su.name=#{name}
+    </select>
+    <select id="findByUserId" resultType="string">
+    SELECT a.code FROM role a INNER JOIN user_role b ON a.id=b.role_id
+    WHERE b.user_id=#{userId}
+    </select>
+</mapper>

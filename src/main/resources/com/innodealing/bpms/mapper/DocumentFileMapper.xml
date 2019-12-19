@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.DocumentFileMapper">
+
+    <resultMap id="documentFileResultMap" type="DocumentFile">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="companyName" column="company_name"/>
+        <result property="bondCode" column="bond_code"/>
+        <result property="bondShortname" column="bond_shortname" />
+        <result property="description" column="description" />
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isFiles" column="isFiles"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="customId" column="custom_id"/>
+        <result property="customCreateTime" column="custom_create_time" />
+        <result property="status" column="status"/>
+        <result property="userId" column="user_id"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="userName" column="userName"/>
+
+        <collection property="documentAttachmentList" ofType="DocumentAttachment">
+            <id property="id" column="attachment_id"/>
+            <result property="documentId" column="attachment_document_id"/>
+            <result property="type" column="attachment_type"/>
+            <result property="name" column="attachment_name"/>
+            <result property="url" column="attachment_url"/>
+            <result property="description" column="attachment_description"/>
+            <result property="createTime" column="attachment_create_time"/>
+        </collection>
+    </resultMap>
+
+    <select id="findCompanyAll" resultMap="documentFileResultMap">
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,t1.create_time,t1.update_time,0 isFiles,
+        sp.order_index,sp.custom_id,DATE(sp.create_time) custom_create_time,
+        t2.id attachment_id,t2.process_id attachment_document_id,t2.type attachment_type,t2.name attachment_name,
+        t2.url attachment_url,t2.description attachment_description,t2.create_time attachment_create_time
+        FROM bpms_process_info t1 JOIN bpms_survive_process sp ON t1.process_id=sp.process_id
+        JOIN bpms_company company ON t1.company_name=company.name AND company.status=0
+        LEFT JOIN bpms_process_attachment t2 ON t1.process_id=t2.process_id
+        WHERE t1.status=32
+        <if test="companyId != null and companyId != ''">
+            AND company.id=#{companyId}
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.bond_code like '%' #{processName} '%' OR t1.bond_shortname like '%' #{processName} '%' OR t1.name
+            like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        <if test="attachmentName != null and attachmentName != ''">
+            AND t2.name like '%' #{attachmentName} '%'
+        </if>
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,tb.shortname bond_shortname,t1.description,t1.create_time,t1.update_time,1 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        t2.id attachment_id,t2.upload_id attachment_document_id,t2.type attachment_type,t2.name attachment_name,
+        t2.url attachment_url,t2.description attachment_description,t2.create_time attachment_create_time
+        FROM bpms_upload t1 JOIN bpms_company company ON t1.company_name=company.name AND company.status=0
+        LEFT JOIN bpms_bond tb ON t1.bond_code=tb.code AND tb.status!=4
+        LEFT JOIN bpms_upload_attachment t2 ON t1.id=t2.upload_id
+        WHERE 1=1
+        <if test="companyId != null and companyId != ''">
+            AND company.id=#{companyId}
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.bond_code like '%' #{processName} '%' OR tb.shortname like '%' #{processName} '%' OR t1.description like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        <if test="attachmentName != null and attachmentName != ''">
+            AND t2.name like '%' #{attachmentName} '%'
+        </if>
+
+    </select>
+
+
+    <select id="findBondAll" resultMap="documentFileResultMap">
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,t1.create_time,t1.update_time,0 isFiles,
+        sp.order_index,sp.custom_id,DATE(sp.create_time) custom_create_time,
+        t2.id attachment_id,t2.process_id attachment_document_id,t2.type attachment_type,t2.name attachment_name,
+        t2.url attachment_url,t2.description attachment_description,t2.create_time attachment_create_time
+        FROM bpms_process_info t1 JOIN bpms_survive_process sp ON t1.process_id=sp.process_id
+        JOIN bpms_bond bond ON t1.bond_code=bond.code AND bond.status!=4
+        LEFT JOIN bpms_process_attachment t2 ON t1.process_id=t2.process_id
+        WHERE t1.status=32
+        <if test="processName != null and processName != ''">
+            AND t1.name like '%' #{processName} '%'
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code=#{bondCode}
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        <if test="attachmentName != null and attachmentName != ''">
+            AND t2.name like '%' #{attachmentName} '%'
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,tb.shortname bond_shortname,t1.description,t1.create_time,t1.update_time,1 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        t2.id attachment_id,t2.upload_id attachment_document_id,t2.type attachment_type,t2.name attachment_name,
+        t2.url attachment_url,t2.description attachment_description,t2.create_time attachment_create_time
+        FROM bpms_upload t1 JOIN bpms_bond tb ON t1.bond_code=tb.code AND tb.status!=4
+        LEFT JOIN bpms_upload_attachment t2 ON t1.id=t2.upload_id
+        WHERE 1=1
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code=#{bondCode}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.description like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        <if test="attachmentName != null and attachmentName != ''">
+            AND t2.name like '%' #{attachmentName} '%'
+        </if>
+
+    </select>
+
+
+    <select id="findCompanyProcessAll" resultMap="documentFileResultMap">
+        SELECT * FROM (
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,t1.create_time create_time,t1.update_time,0 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        0 status,'' user_id,'' role_code,'' account,'' userName
+        FROM bpms_process_info t1 JOIN bpms_survive_process sp ON t1.process_id=sp.process_id AND IFNULL(sp.order_index,0)=0
+        JOIN bpms_company company ON t1.company_name=company.name AND company.status=0
+        WHERE t1.status=32
+        <if test="companyId != null and companyId != ''">
+            AND company.id=#{companyId}
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.bond_code like '%' #{processName} '%' OR t1.bond_shortname like '%' #{processName} '%' OR t1.name
+            like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,DATE(t1.create_time) create_time,t1.update_time,0 isFiles,
+        sp.order_index,sp.custom_id,DATE(sp.create_time) custom_create_time,
+        0 status,'' user_id,'' role_code,'' account,'' userName
+        FROM bpms_process_info t1 JOIN (
+            SELECT * FROM bpms_survive_process WHERE status=1 AND order_index>0 GROUP BY custom_id,DATE(create_time)
+        ) sp ON t1.process_id=sp.process_id JOIN bpms_company company ON t1.company_name=company.name AND company.status=0
+        WHERE t1.status=32
+        <if test="companyId != null and companyId != ''">
+            AND company.id=#{companyId}
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.bond_code like '%' #{processName} '%' OR t1.bond_shortname like '%' #{processName} '%' OR t1.name
+            like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,tb.shortname bond_shortname,t1.description,t1.create_time,t1.update_time,1 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        t1.status,t1.user_id,t1.role_code,t1.account,ts.name userName
+        FROM bpms_upload t1 JOIN bpms_company company ON t1.company_name=company.name AND company.status=0
+        LEFT JOIN bpms_bond tb ON t1.bond_code=tb.code AND tb.status!=4
+        LEFT JOIN sys_user ts ON t1.user_id=ts.id
+        WHERE 1=1
+        <if test="companyId != null and companyId != ''">
+            AND company.id=#{companyId}
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.bond_code like '%' #{processName} '%' OR tb.shortname like '%' #{processName} '%' OR t1.description like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        ) tab ORDER BY tab.update_time DESC
+
+    </select>
+
+
+    <select id="findBondProcessAll" resultMap="documentFileResultMap">
+        SELECT * FROM (
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,t1.create_time,t1.update_time,0 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        0 status,'' user_id,'' role_code,'' account,'' userName
+        FROM bpms_process_info t1 JOIN bpms_survive_process sp ON t1.process_id=sp.process_id AND IFNULL(sp.order_index,0)=0
+        JOIN bpms_bond bond ON t1.bond_code=bond.code AND bond.status!=4
+        WHERE t1.status=32
+        <if test="processName != null and processName != ''">
+            AND t1.name like '%' #{processName} '%'
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code=#{bondCode}
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,t1.bond_shortname,t1.description,t1.create_time,t1.update_time,0 isFiles,
+        sp.order_index,sp.custom_id,DATE(sp.create_time) custom_create_time,
+        0 status,'' user_id,'' role_code,'' account,'' userName
+        FROM bpms_process_info t1 JOIN (
+            SELECT * FROM bpms_survive_process WHERE status=1 AND order_index>0 GROUP BY custom_id,DATE(create_time)
+        ) sp ON t1.process_id=sp.process_id
+        JOIN bpms_bond bond ON t1.bond_code=bond.code AND bond.status!=4
+        WHERE t1.status=32
+        <if test="processName != null and processName != ''">
+            AND t1.name like '%' #{processName} '%'
+        </if>
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code=#{bondCode}
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+
+        UNION ALL
+
+        SELECT
+        t1.id,t1.type,t1.company_name,t1.bond_code,tb.shortname bond_shortname,t1.description,t1.create_time,t1.update_time,1 isFiles,
+        0 order_index,0 custom_id,t1.create_time custom_create_time,
+        t1.status,t1.user_id,t1.role_code,t1.account,ts.name userName
+        FROM bpms_upload t1 JOIN bpms_bond tb ON t1.bond_code=tb.code AND tb.status!=4
+        LEFT JOIN sys_user ts ON t1.user_id=ts.id
+        WHERE 1=1
+        <if test="processType != null and processType != ''">
+            AND t1.type=#{processType}
+        </if>
+        <if test="bondCode != null and bondCode != ''">
+            AND t1.bond_code=#{bondCode}
+        </if>
+        <if test="processName != null and processName != ''">
+            AND (t1.description like '%' #{processName} '%')
+        </if>
+        <if test="stime != null and stime != ''">
+            AND t1.update_time &gt;= #{stime}
+        </if>
+        <if test="etime != null and etime != ''">
+            AND t1.update_time &lt;= DATE(#{etime})
+        </if>
+        ) tab ORDER BY tab.update_time DESC
+
+    </select>
+
+
+
+
+</mapper>

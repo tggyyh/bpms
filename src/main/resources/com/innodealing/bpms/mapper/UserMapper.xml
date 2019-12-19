@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.UserMapper">
+    <select id="findUser" resultType="User">
+        SELECT * from sys_user
+    </select>
+    <select id="findById" resultType="User">
+        SELECT * from sys_user where id=#{id}
+    </select>
+    <select id="findByPage" parameterType="ReqData" resultType="User">
+        SELECT a.*,c.name as roleName from sys_user a left JOIN  user_role b ON a.id=b.user_id
+        left join role c on b.role_id=c.id
+        <where>
+            1=1
+            <if test="name != ''">
+                and a.`name` like '%' #{name} '%'
+            </if>
+            <if test="accountNumber != ''">
+                and account_number= #{accountNumber}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <!--Insert-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="User">
+        INSERT INTO sys_user (`name`, account, password, role_id,operator)
+        VALUES (#{name}, #{account}, #{password}, #{roleId},#{operator})
+    </insert>
+    <!--Update-->
+    <update id="update" parameterType="User">
+        UPDATE sys_user SET
+        `name`=#{name},
+        account=#{account},
+        role_id=#{roleId},
+        operator=#{operator},
+        update_time=NOW()
+        WHERE id=#{id}
+    </update>
+    <delete id="delete">
+        delete from sys_user WHERE id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findByAccount" resultType="User">
+        SELECT * from sys_user where `user_id`=#{userId}
+    </select>
+
+    <update id="updateByRoleIds">
+        update sys_user set role_id=NULL WHERE role_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updatePWD">
+        update sys_user set password=#{1} where account=#{0}
+    </update>
+    <select id="findByRoleCode" resultType="User">
+          SELECT a.* FROM sys_user a
+          INNER JOIN user_role b ON a.id=b.user_id
+          INNER JOIN role c ON b.role_id=c.id
+          WHERE c.code=#{roleCode}
+    </select>
+    <select id="findByCompany" resultType="User">
+              SELECT c.name,c.email,c.phone FROM bpms_bond a INNER JOIN bpms_bond_manager b
+       ON a.code=b.bond_code
+       INNER JOIN sys_user c
+       ON b.user_id=c.`id`
+       WHERE a.company_name=#{companyName}
+    </select>
+    <select id="findByBond" resultType="User">
+       SELECT c.name,c.email,c.phone FROM bpms_bond a INNER JOIN bpms_bond_manager b
+       ON a.code=b.bond_code
+       INNER JOIN sys_user c
+       ON b.user_id=c.`id`
+       WHERE a.code=#{bondCode}
+    </select>
+
+    <select id="findLinkmanByCompany" resultType="User">
+        SELECT `name`,phone,mobile,mail AS email FROM `bpms_company_linkman`
+         WHERE company_name=#{companyName}
+    </select>
+    <select id="findRoleById" resultType="Role">
+        SELECT c.* FROM sys_user a
+        INNER JOIN user_role b ON a.id=b.user_id
+        INNER JOIN role c ON b.role_id=c.id
+        WHERE a.id=#{userId}
+    </select>
+    <delete id="deleteRole" parameterType="User">
+        delete from user_role where user_id=#{id}
+    </delete>
+    <insert id="addRole" parameterType="User">
+        insert into  user_role (user_id,role_id)values(#{id},#{roleId})
+    </insert>
+    <delete id="deleteRoles">
+        delete from user_role where role_id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findUserRoleById" resultType="User">
+        SELECT t1.*,t3.id roleId,t3.`code` roleCode,t3.`name` roleName
+        FROM sys_user t1 LEFT JOIN user_role t2 ON t1.id=t2.user_id
+        LEFT JOIN role t3 ON t2.role_id=t3.id
+        WHERE t1.id=#{id}
+    </select>
+</mapper>

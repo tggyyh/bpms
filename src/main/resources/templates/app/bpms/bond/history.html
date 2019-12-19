@@ -1,0 +1,18 @@
+<script th:src="@{/js/app/bpms/bond/history.js}"></script>
+<div id="divHistory" class="wrapper wrapper-content animated fadeInRight">
+    <div class="row" th:each="historyLog,historyLogStat:${historyLogList}">
+        <div th:if="${historyLog.logUserId}!='000000'">
+            <div class="col-sm-12 historylog-title">
+                <div class="historylog-left" th:text="${historyLogList.size()-historyLogStat.index}+'.'+${#dates.format(historyLog.logDate, 'yyyy-MM-dd HH:mm:ss')}+'，由'"></div>
+                <div class="historylog-left historylog-user" th:text="${historyLog.logUser}"></div>
+                <div class="historylog-left" th:text="${historyLog.logMark}"></div>
+                <div class="fa fa-plus-square-o historylog-left historylog-icon" th:id="'divItem-'+${historyLogStat.count}" th:if="${historyLog.logOperateType}==2 or ${historyLog.logOperateType}==4 or ${historyLog.logOperateType}==5" onclick="showItemContent(this)"/>
+            </div>
+            <div th:name="'divItem-'+${historyLogStat.count}"  class="col-sm-12 hide">
+                <div class="historylog-padding-5" th:each="contentItem,logContentStat:${historyLog.logContent}">
+                    <div class="historylog-content" th:utext="${contentItem}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

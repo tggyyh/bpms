@@ -1,0 +1,58 @@
+
+<div class="form-group col-sm-12">
+    <input type="hidden" id="hidUserId" th:value="${userId}" />
+    <input type="hidden" id="hidRoleCode" th:value="${roleCode}" />
+
+    <label class="control-label col-sm-1 label-top-5 text-right">日期：</label>
+    <div class="col-sm-5">
+        <div class="col-sm-12 input-daterange input-group">
+            <input type="text" id="stime" name="stime" class="input-sm form-control dpicker" value="" />
+            <span class="input-group-addon">到</span>
+            <input type="text" id="etime" name="etime" class="input-sm form-control dpicker" value="" />
+        </div>
+    </div>
+
+    <label class="control-label col-sm-2 label-top-5 text-right">事项类型：</label>
+    <div class="col-sm-3">
+        <select id="drop_search_process_templatetype" class="col-sm-7 form-control" tabindex="2">
+            <option value="" selected="selected">全部事项</option>
+            <option value="0">发行人事项</option>
+            <option value="1">项目事项</option>
+        </select>
+    </div>
+
+</div>
+
+<div class="form-group col-sm-12">
+
+    <label class="control-label col-sm-1 label-top-5 text-right">关键字：</label>
+    <div class="col-sm-3">
+        <input type="text" id="txt_search_process_name" class="form-control" placeholder="事项名称关键字" />
+    </div>
+
+    <label class="control-label col-sm-1 label-top-5 text-right">文件名：</label>
+    <div class="col-sm-3">
+        <input type="text" id="txt_search_attachment_name" class="form-control" placeholder="材料文件名关键字" />
+    </div>
+
+    <div class="col-sm-2 text-right">
+        <button type="button" id="btn_infoAttahment_query" class="btn btn-primary">查询</button>
+    </div>
+
+    <div class="col-sm-2 text-center">
+        <button id="btnUpload" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span class="bold">上传材料</span>
+        </button>
+    </div>
+
+</div>
+
+<div id="divDocumentFiles" class="col-sm-12 linkmatter-overflow-y">
+    <div id="vertical-timeline" class="vertical-container light-timeline attachment-vertical-left">
+
+    </div>
+</div>
+
+<div id="pagePagination"></div>
+
+<script th:src="@{/js/app/bpms/company/infoAttachment.js}"></script>
+

@@ -1,0 +1,16 @@
+
+<script th:src="@{/js/app/bpms/companylinkman/bondman.js}"></script>
+
+<div class="wrapper wrapper-content">
+    <div id="divBondManContent" class="row" style="overflow-x: hidden;overflow-y: auto;padding-bottom: 15px;">
+        <div class="col-sm-2 text-center" th:each="sysuser,sysuserStat:${userList}">
+            <input type="checkbox" name="cbxBondMan" th:id="'cbx-' + ${sysuser.id}" th:value="${sysuser.name}" th:text="${sysuser.name}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 text-center">
+            <button type="button" id="btnBondManSave" class="btn btn-w-m btn-warning">保存</button>
+            <button type="button" id="btnBondManCancel" class="btn btn-w-m btn-default">取消</button>
+        </div>
+    </div>
+</div>

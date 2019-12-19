@@ -1,0 +1,97 @@
+<div class="row">
+    <div class="col-sm-3 link-menu">
+        <div id="divMenuBond" class="link-menu-tag">
+            <div class="col-sm-11 link-menu-title">
+                项目模板事项(&nbsp; <span th:text="null==${bondMatterList}?'0':${bondMatterList.size()}"></span> 项&nbsp;)
+            </div>
+            <div class="col-sm-1 link-menu-title-icon">
+                <span id="spanBondMenuIcon" class="glyphicon glyphicon-triangle-bottom"></span>
+            </div>
+        </div>
+        <div th:each="bondMatter,bondMatterStat:${bondMatterList}" th:id="'bond-'+${bondMatter.matterTemplate.id}" name="divBondMatter" th:text="${bondMatter.matterTemplate.name}" th:title="${bondMatter.matterTemplate.name}" class="link-menu-text"></div>
+
+        <div id="divMenuCustomBond" class="link-menu-tag">
+            <div class="col-sm-11 link-menu-title">
+                项目自定义事项(&nbsp; <span th:text="null==${customMatterList}?'0':${customMatterList.size()}"></span> 项&nbsp;)
+            </div>
+            <div class="col-sm-1 link-menu-title-icon">
+                <span id="spanCustomBondMenuIcon" class="glyphicon glyphicon-triangle-bottom"></span>
+            </div>
+        </div>
+        <div th:each="customMatter,customBondMatterStat:${customMatterList}" th:id="'custombond-'+${customMatter.id}" name="divCustomBond" th:text="${customMatter.name}" th:title="${customMatter.name}" class="link-menu-text"></div>
+    </div>
+    <div class="col-sm-9 link-item" style="padding-left:0;">
+
+        <table id="tabInfoMatter" style="width:100%;">
+            <tr>
+                <td id="tdTemplateIcon" style="width:90px;">
+                </td>
+                <td id="tdTemplateName">
+                </td>
+            </tr>
+            <tr id="trAutoRelate">
+                <td class="link-item-autorelate">自动关联：</td>
+                <td id="tdAutoRelate" class="link-item-autorelate">
+                </td>
+            </tr>
+            <tr id="trRule">
+                <td class="link-item-rule">触发规则：</td>
+                <td id="tdTemplateRule" class="link-item-rule">
+                </td>
+            </tr>
+
+            <tr>
+                <td class="link-item-confirm">督导确认：</td>
+                <td id="tdTemplateConfirm" class="link-item-confirm">
+                </td>
+            </tr>
+
+            <tr>
+                <td class="link-item-mailuser">
+                    <input type="hidden" id="hidMailUser" value="" />
+                    触发通知：
+                </td>
+                <td id="tdTemplateMailUser" class="link-item-mailuser">
+                    <div id="divMailUser"></div>
+                </td>
+            </tr>
+
+            <tr name="trUnSubMatter">
+                <td class="link-item-mailuser">提醒频率：</td>
+                <td id="tdTemplateFrequency" class="link-item-mailuser">
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding-top:30px;">所需材料：</td>
+                <td id="tdTemplateFileTile" style="padding-top:30px;">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <div id="divTemplateFiles">
+                    </div>
+                </td>
+            </tr>
+            <tr name="trUnSubMatter">
+                <td class="link-item-confirm">事项内容：</td>
+                <td class="link-item-confirm"></td>
+            </tr>
+            <tr name="trSubMatter">
+                <td></td>
+                <td>
+                    <div id="divTemplateContent"  style="word-break: break-all; word-wrap:break-word;">
+
+                    </div>
+                </td>
+            </tr>
+
+
+        </table>
+
+
+    </div>
+</div>
+
+<script th:src="@{/js/app/bpms/bond/infoMattertemplate.js}"></script>

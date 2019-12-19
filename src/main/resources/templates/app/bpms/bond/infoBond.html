@@ -1,0 +1,211 @@
+
+<div th:if="null!=${bondInfo}" class="row link-company-title">
+    <div class="col-sm-12">
+        <div class="col-sm-4">
+            <span id="divBondName" class="col-sm-6 font-size-18" th:text="null==${bondInfo.shortname}?'':${bondInfo.shortname}"></span>
+            <span id="divBondCode" class="col-sm-6" th:text="null==${bondInfo.code}?'':${bondInfo.code}"></span>
+        </div>
+        <div class="col-sm-4">
+            <span id="spanCompany" class="font-size-18" th:text="null==${bondInfo.companyName}?'':${bondInfo.companyName}"></span>
+        </div>
+        <div class="col-sm-4">
+            <span class="col-sm-2 link-area-color">省</span>
+            <span class="col-sm-4" id="spanProvinceName" th:text="null==${bondInfo.company.provinceName}?'':${bondInfo.company.provinceName}"></span>
+            <span class="col-sm-2 link-area-color">市</span>
+            <span class="col-sm-4" id="spanCityName" th:text="null==${bondInfo.company.cityName}?'':${bondInfo.company.cityName}"></span>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="col-sm-4">
+            <span class="link-area-color">债券评级1</span>
+            <span th:text="null==${bondInfo.rating1}?'':${bondInfo.rating1}"></span>
+        </div>
+        <div class="col-sm-4">
+            <span class="link-area-color">主体评级1</span>
+            <span th:text="null==${bondInfo.company.corporateRating1}?'':${bondInfo.company.corporateRating1}"></span>
+        </div>
+        <div class="com-sm-4">
+            <span class="link-area-color">行业</span>
+            <span th:text="null==${bondInfo.company.industryBigTypeName}?'':${bondInfo.company.industryBigTypeName}"></span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">债券全称</div>
+    <div class="col-sm-6 link-bond-text" th:text="null==${bondInfo.name}?'':${bondInfo.name}"></div>
+    <div class="col-sm-2 link-bond-label">上市场所</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.listedPlace}?'':${bondInfo.listedPlace}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">是否跨市场</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.crossMarket}?'':${bondInfo.crossMarket}"></div>
+    <div class="col-sm-2 link-bond-label">当前余额</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.currentBalance}?'':(${bondInfo.currentBalance} + '亿')"></div>
+    <div class="col-sm-2 link-bond-label">债券类型</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.type}?'':${bondInfo.type}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">利率类型</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.rateType}?'':${bondInfo.rateType}"></div>
+    <div class="col-sm-2 link-bond-label">付息方式</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.interestPayMode}?'':${bondInfo.interestPayMode}"></div>
+    <div class="col-sm-2 link-bond-label">付息频率</div>
+    <input type="hidden" id="hidPayFrequency" th:value="${bondInfo.payFrequency}"/>
+    <div id="divPayFrequency" class="col-sm-2 link-bond-text" th:text="null==${bondInfo.payFrequency}?'':(${bondInfo.payFrequency}==0?'按季支付':(${bondInfo.payFrequency}==1?'按年支付':''))"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">债券期限</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.timeLimit}?'':(${bondInfo.timeLimit}+'年')"></div>
+    <div class="col-sm-2 link-bond-label">特殊期限</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.specialTimeLimit}?'':(${bondInfo.specialTimeLimit}+'年')"></div>
+    <div class="col-sm-2 link-bond-label">本金偿还方式</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.repayMode}?'':${bondInfo.repayMode}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">起息日期</div>
+    <div id="divValueDate" class="col-sm-2 link-bond-text" th:text="null!=${bondInfo.valueDate}?${#dates.format(bondInfo.valueDate, 'yyyy-MM-dd')}"></div>
+    <div class="col-sm-2 link-bond-label">兑付日期</div>
+    <div id="divPayDay" class="col-sm-2 link-bond-text" th:text="null!=${bondInfo.payDay}?${#dates.format(bondInfo.payDay, 'yyyy-MM-dd')}"></div>
+    <div class="col-sm-2 link-bond-label">选择权种类</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.optionType}?'':${bondInfo.optionType}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">行权期</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.exerciseSchedule}?'':${bondInfo.exerciseSchedule}"></div>
+    <div class="col-sm-2 link-bond-label">票面金额</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.currentPeriodAmount}?'':${bondInfo.currentPeriodAmount}"></div>
+    <div class="col-sm-2 link-bond-label">票面利率</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.rate}?'':${bondInfo.rate}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">票面利率调整上限</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.rateHigh}?'':(${bondInfo.rateHigh} + '%')"></div>
+    <div class="col-sm-2 link-bond-label">票面利率调整下限</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.rateLow}?'':(${bondInfo.rateLow} + '%')"></div>
+    <div class="col-sm-2 link-bond-label">核准总额</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.documentAmount}?'':(${bondInfo.documentAmount} + '亿')"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">初始换股价格</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.stockExchangePrice}?'':(${bondInfo.stockExchangePrice} + '元')"></div>
+    <div class="col-sm-2 link-bond-label">初始换股比例</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.stockExchangeRatio}?'':(${bondInfo.stockExchangeRatio} + '%')"></div>
+    <div class="col-sm-2 link-bond-label">换股期间</div>
+    <div class="col-sm-2 link-bond-text" th:text="(null==${bondInfo.stockExchangeBegin}?'':${#dates.format(bondInfo.stockExchangeBegin, 'yyyy-MM-dd')}) + '-' + (null==${bondInfo.stockExchangeEnd}?'':${#dates.format(bondInfo.stockExchangeEnd, 'yyyy-MM-dd')})"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">内含特殊条款</div>
+    <div class="col-sm-6 link-bond-text" th:text="null==${bondInfo.specialTerm}?'':${bondInfo.specialTerm}"></div>
+    <div class="col-sm-2 link-bond-label">特殊条款类别</div>
+    <div class="col-sm-2 link-bond-text" th:text="null==${bondInfo.specailTermType}?'':${bondInfo.specailTermType}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">债券受托管理人</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.bondManager}"></div>
+    <div class="col-sm-2 link-bond-label">转股标的股票代码</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.bidStockCode}"></div>
+    <div class="col-sm-2 link-bond-label">上市日</div>
+    <div id="divListedDate" class="col-sm-2 link-bond-text" th:text="null!=${bondInfo.listedDate}?${#dates.format(bondInfo.listedDate, 'yyyy-MM-dd')}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">赎回条款</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.ransomTerm}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">回售条款</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.backSaleTerm}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">可交换为股票条款</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.exchangeStockTerm}"></div>
+</div>
+<div class="row" style="border-bottom:dashed 1px;padding-bottom: 20px;">
+    <div class="col-sm-2 link-bond-label">减记条款</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.writeDownTerm}"></div>
+</div>
+
+<div class="row" style="border-bottom:dashed 1px;padding-bottom: 20px;">
+    <div class="col-sm-2 link-bond-label">发行规模</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.scale}+'亿'"></div>
+    <div class="col-sm-2 link-bond-label">发行价格</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.price}+'元'"></div>
+    <div class="col-sm-2 link-bond-label">发行定价方式</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.fixPriceType}"></div>
+    <div class="col-sm-2 link-bond-label">发行方式</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.publishType}"></div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 link-bond-label">主承销商名称</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.underwriterName}"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2 link-bond-label">副主承销商名称</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.viceUnderwriterName}"></div>
+</div>
+<div class="row" style="border-bottom:dashed 1px;padding-bottom: 20px;">
+    <div class="col-sm-2 link-bond-label">承销方式</div>
+    <div class="col-sm-10 link-bond-text" th:text="${bondInfo.underwritingMode}"></div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 link-bond-label">债项评级机构名称1</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.bondRatingCompany1}"></div>
+    <div class="col-sm-2 link-bond-label">发行时债项评级1</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.rating1}"></div>
+</div>
+<div class="row" style="border-bottom:dashed 1px;padding-bottom: 20px;">
+    <div class="col-sm-2 link-bond-label">债项评级机构名称2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.bondRatingCompany2}"></div>
+    <div class="col-sm-2 link-bond-label">发行时债项评级2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.rating2}"></div>
+    <div class="col-sm-2 link-bond-label">债项评级机构组织机构代码2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.bondRatingOrgCode2}"></div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 link-bond-label">担保机构名称1</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.guaranteeCompany1}"></div>
+    <div class="col-sm-2 link-bond-label">担保方式1</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.guaranteeMode1}"></div>
+    <div class="col-sm-2 link-bond-label">信用增级方式</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.creditMode}"></div>
+</div>
+<div class="row" style="border-bottom: solid 1px;">
+    <div class="col-sm-2 link-bond-label">担保机构名称2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.guaranteeCompany2}"></div>
+    <div class="col-sm-2 link-bond-label">担保方式2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.guaranteeMode2}"></div>
+    <div class="col-sm-2 link-bond-label">担保机构组织机构代码2</div>
+    <div class="col-sm-2 link-bond-text" th:text="${bondInfo.guaranteeOrgCode2}"></div>
+</div>
+
+<br/>
+<br/>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="tabs-container">
+            <ul id="sysuserTab" class="nav nav-tabs layer-tabs">
+                <li class="active">
+                    <a id="tab-linkBond" data-toggle="tab" href="#tab-infoLinkBond" aria-expanded="true">项目负责人</a>
+                </li>
+                <li class="">
+                    <a id="tab-linkBank" data-toggle="tab" href="#tab-infoLinkBank" aria-expanded="false">监管银行负责人</a>
+                </li>
+            </ul>
+            <div class="tab-content padding-top-1">
+                <div id="tab-infoLinkBond" class="tab-pane active">
+                    <div id="divInfoLinkBond" class="panel-body" style="padding-top:0px;">
+                    </div>
+                </div>
+                <div id="tab-infoLinkBank" class="tab-pane">
+                    <div id="divInfoLinkBank" class="panel-body" style="padding-top:0px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:src="@{/js/app/bpms/bond/infoBond.js}"></script>

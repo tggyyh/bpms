@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.InitHistoryMapper">
+    <select id="findCompanyMatter" resultType="CompanyMatter">
+          SELECT id,company_name,template_id,`status` FROM `bpms_company_matter`
+           WHERE template_id=#{id}
+    </select>
+    <select id="findBondMatter" resultType="BondMatter">
+    SELECT id,bond_code,template_id,`status` FROM `bpms_bond_matter`
+    WHERE template_id=#{id}
+    </select>
+    <select id="findAllBondCodes" resultType="string">
+        SELECT code FROM `bpms_bond`
+    </select>
+    <select id="findByBondCode" resultType="BondMatter">
+        SELECT id,bond_code,template_id,`status` FROM `bpms_bond_matter`
+    WHERE bond_code=#{code}
+    </select>
+    <select id="findByKey" resultType="Integer">
+        SELECT id FROM `bpms_custom_matter`
+        WHERE `key`=#{code} and relation=1
+    </select>
+    <select id="findAllCompanys" resultType="string">
+        SELECT `name` FROM `bpms_company`
+    </select>
+    <select id="findByName" resultType="CompanyMatter">
+       SELECT id,company_name,template_id,`status` FROM `bpms_company_matter`
+           WHERE company_name=#{name}
+    </select>
+</mapper>

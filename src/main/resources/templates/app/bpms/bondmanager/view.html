@@ -1,0 +1,29 @@
+
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <table id="tabUser" class="linkman-table">
+            <tr class="linkman-header">
+                <td class="td-v">姓名</td>
+                <td class="td-v">手机</td>
+                <td class="td-v">邮箱</td>
+            </tr>
+            <tr th:each="user,userStat:${userList}">
+                <td>
+                    <div class="linkman-bond">
+                        <div th:text="null==${user.name}?'':${user.name}"></div>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <div th:text="null==${user.phone}?'':${user.phone}"></div>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <div th:text="null==${user.email}?'':${user.email}"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

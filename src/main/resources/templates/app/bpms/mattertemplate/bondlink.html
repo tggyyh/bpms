@@ -1,0 +1,205 @@
+<script th:src="@{/js/app/bpms/mattertemplate/bondlink.js}"></script>
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="ibox">
+
+                <div class="ibox-title">
+                    <div class="form-group">
+                        <input type="hidden" id="hidBondTemplateId" th:value="${templateId}" />
+                        <input type="hidden" id="hidLinkNames" th:value="${linkNames}" />
+
+                        <div class="form-group col-sm-12">
+                            <div class="col-sm-2">
+                                <input type="text" id="txt_search_name" class="form-control" placeholder="债券代码、简称" />
+                            </div>
+
+                            <label class="col-sm-1 control-label label-top-5">关联状态：</label>
+                            <div class="col-sm-2">
+                                <select id="drop_search_linkman" class="form-control" tabindex="2">
+                                    <option value="">全部</option>
+                                    <option value="0">已关联</option>
+                                    <option value="1">未关联</option>
+                                </select>
+                            </div>
+
+                            <div class="col-sm-5">
+                                <label class="control-label col-sm-2 label-top-5 text-right">省：</label>
+                                <div class="col-sm-4">
+                                    <select id="drop_search_province" name="type" class="form-control" tabindex="2">
+                                    </select>
+                                </div>
+
+                                <label class="control-label col-sm-2 label-top-5 text-right">市：</label>
+                                <div class="col-sm-4">
+                                    <select id="drop_search_city" name="type" class="form-control" tabindex="2">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 text-right commonSearch">
+                                <button type="button" name="btn_query" class="btn btn-primary">查询</button>
+                                <input type="checkbox" name="cbxAdvanced" />高级搜索
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12 advancedSearch">
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">起息日：</label>
+                            <div class="col-sm-5">
+                                <div class="input-daterange input-group">
+                                    <input type="text" id="txt_search_valueDateBegin" name="txt_search_valueDateBegin" class="input-sm form-control dpicker" value="" />
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" id="txt_search_valueDateEnd" name="txt_search_valueDateEnd" class="input-sm form-control dpicker" value="" />
+                                </div>
+                            </div>
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">上市日：</label>
+                            <div class="col-sm-5">
+                                <div class="input-daterange input-group">
+                                    <input type="text" id="txt_search_listedDateBegin" name="txt_search_listedDateBegin" class="input-sm form-control dpicker" value="" />
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" id="txt_search_listedDateEnd" name="txt_search_listedDateEnd" class="input-sm form-control dpicker" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-12 advancedSearch">
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">兑付：</label>
+                            <div class="col-sm-5">
+                                <div class="input-daterange input-group date form_datetime">
+                                    <input type="text" id="txt_search_payDayBegin" name="txt_search_payDayBegin" class="form-control c-disable" value="" data-date-format="yyyy年" />
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" id="txt_search_payDayEnd" name="txt_search_payDayEnd" class="form-control c-disable" value="" data-date-format="yyyy年" />
+                                </div>
+                            </div>
+
+                            <label class="control-label col-sm-1 label-top-5 text-right">期限：</label>
+                            <div class="col-sm-5">
+                                <div class="input-daterange input-group">
+                                    <input type="text" id="txt_search_timeLimitBegin" name="txt_search_timeLimitBegin" class="form-control" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" id="txt_search_timeLimitEnd" name="txt_search_timeLimitEnd" class="form-control" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group col-sm-12 advancedSearch">
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">当前余额（亿元）：</label>
+                            <div class="col-sm-3">
+                                <div class="input-daterange input-group">
+                                    <input type="text" id="txt_search_currentBalanceBegin" name="txt_search_currentBalanceBegin" class="input-sm form-control val-decimal" value="" />
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" id="txt_search_currentBalanceEnd" name="txt_search_currentBalanceEnd" class="input-sm form-control val-decimal" value="" />
+                                </div>
+                            </div>
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">债券类型：</label>
+                            <div class="col-sm-3">
+                                <select id="drop_search_type" name="drop_search_type" multiple="multiple" class="selectpicker" tabindex="2" data-style="btn-white">
+                                    <option value="企业债">企业债</option>
+                                    <option value="FB07-政策性金融债">FB07-政策性金融债</option>
+                                    <option value="CB030-公募公司债">CB030-公募公司债</option>
+                                    <option value="CB031-私募公司债">CB031-私募公司债</option>
+                                    <option value="CB05-分离交易的可转换公司债">CB05-分离交易的可转换公司债</option>
+                                    <option value="CB04-普通可转换公司债">CB04-普通可转换公司债</option>
+                                    <option value="ABS02-企业资产支持证券">ABS02-企业资产支持证券</option>
+                                    <option value="ABS01-信贷资产支持证券">ABS01-信贷资产支持证券</option>
+                                </select>
+                            </div>
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">是否跨市场：</label>
+                            <div class="col-sm-3">
+                                <select id="drop_search_crossMarket" name="drop_search_crossMarket" multiple="multiple" class="selectpicker" tabindex="2" data-style="btn-white">
+                                    <option value="YN01-是">YN01-是</option>
+                                    <option value="YN02-否">YN02-否</option>
+                                    <option value="0000-信息缺失">0000-信息缺失</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group col-sm-12 advancedSearch">
+
+                            <label class="col-sm-1 control-label label-top-5 text-right">项目人员：</label>
+                            <div class="col-sm-2">
+                                <select id="drop_search_user" tabindex="2" multiple="multiple" class="selectpicker" data-style="btn-white">
+                                    <option th:each="user,userStat:${userList}" th:value="${user.id}" th:text="${user.name}"></option>
+                                </select>
+                            </div>
+
+                            <label class="control-label col-sm-1 label-top-5 text-right">上市场所：</label>
+                            <div class="col-sm-2">
+                                <select id="drop_search_listedPlace" multiple="multiple" class="selectpicker" tabindex="2" data-size="5" data-style="btn-white">
+                                    <option value="MP01-上海证券交易所">MP01-上海证券交易所</option>
+                                    <option value="MP02-深圳证券交易所">MP02-深圳证券交易所</option>
+                                    <option value="MP03-银行间市场">MP03-银行间市场</option>
+                                    <option value="MP04-全国中小企业股份转让系统">MP04-全国中小企业股份转让系统</option>
+                                    <option value="MP05-机构间私募产品报价与服务系统">MP05-机构间私募产品报价与服务系统</option>
+                                    <option value="MP06-证券公司柜台转让">MP06-证券公司柜台转让</option>
+                                    <option value="MP99-其他">MP99-其他</option>
+                                    <option value="9999-信息缺失">9999-信息缺失</option>
+                                </select>
+                            </div>
+
+                            <label class="control-label col-sm-1 label-top-5 text-right">担保：</label>
+                            <div class="col-sm-2">
+                                <input id="txt_search_guaranteeCompany" type="text" class="form-control"/>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group col-sm-12 advancedSearch">
+
+                            <label class="control-label col-sm-1 label-top-5 text-right">受托管理人：</label>
+                            <div class="col-sm-3">
+                                <select id="drop_search_managerType" name="drop_search_managerType" class="form-control" tabindex="2">
+                                    <option value="" selected="selected">全部</option>
+                                    <option value="0">天风</option>
+                                    <option value="1">非天风</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <input id="txt_search_bondManager" type="text" class="form-control"/>
+                            </div>
+
+                            <label class="control-label col-sm-1 label-top-5 text-right">主承销商：</label>
+                            <div class="col-sm-2">
+                                <input id="txt_search_underwriterName" type="text" class="form-control"/>
+                            </div>
+
+                            <div class="col-sm-3 text-right">
+                                <button type="button" name="btn_query" class="btn btn-primary">查询</button>
+                                <input type="checkbox" name="cbxAdvanced" />高级搜索
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="col-sm-12">
+                        <div class="col-sm-2">
+                            <label class="control-label">已关联：</label>
+                            <span id="spanLinkMan" style="color:#00CC00;" th:text="${linkCount}"></span>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label">未关联：</label>
+                            <span id="spanUnLinkMan" style="color: #FF0000;" th:text="${unLinkCount}"></span>
+                        </div>
+                    </div>
+                    <div id="toolbar" class="col-sm-12">
+                        <button id="btn_bond_update" type="button" class="btn btn-w-m btn-info">修改</button>
+                        <button id="btn_bond_save" type="button" class="btn btn-w-m btn-info" disabled="disabled">保存</button>
+                    </div>
+                    <table id="tabBondLink" style="width:1460px;table-layout:fixed;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <div th:replace="shared/sharedcss"></div>
+    <div th:replace="shared/sharedjs"></div>
+    <div th:replace="shared/ctxpathjs"></div>
+    <script th:src="@{/js/app/bpms/mattertemplate/index.js}"></script>
+</head>
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="ibox">
+
+                <div class="ibox-title">
+                    <span class="tmp-head">模板事项</span>
+                    <shiro:hasPermission name="template:edit">
+                    <button class="btn btn-blue " type="button" id="btnAdd">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;
+                        <span class="bold">创建新事项</span>
+                    </button>
+                    </shiro:hasPermission>
+                </div>
+
+                <div class="ibox-content" style="padding:0;">
+
+                    <div class="project-list tmp-list">
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <td colspan="5">
+                                    <div class="row tmp-title">
+                                        <span id="spanCompanyTemp" class="glyphicon glyphicon-triangle-bottom cursor-pointer">&nbsp;发行人模板事项</span>
+                                        <span class="tmp-title-num" th:text="'('+${orgTemplateList.size()}+')'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tr-hover tr-comp" th:each="orgTemplate,orgTemplateStat:${orgTemplateList}">
+                                <td>
+                                    <div class="tmp-row tmp-name-row">
+                                        <div class="tmp-border-right">
+                                            <div class="tmp-icon" th:text="${orgTemplate.shortname}" data-toggle="tooltip" th:title="${orgTemplate.shortname}" th:style="'background-color:'+${orgTemplate.color}+';border-color:'+${orgTemplate.color}"></div>
+                                            <div class="tmp-content">
+                                                <div class="content-name" th:text="${orgTemplate.name}" data-toggle="tooltip" th:title="${orgTemplate.name}"></div>
+                                                <div class="content-text" th:text="${orgTemplate.description}" data-toggle="tooltip" th:title="${orgTemplate.description}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-rule-row">
+                                        <div class="tmp-border-right">
+                                            <div>提醒规则：</div>
+                                            <div class="tmp-rule">
+                                                <div th:each="templateRule,templateRuleStat:${orgTemplate.templateRuleList}" th:if="${templateRule.type}==0" th:class="${templateRuleStat.index}&gt;1?'hide'">
+                                                    <span>提醒：<span th:text="${#dates.format(templateRule.remindDate, 'MM月dd日')}"></span></span>&nbsp;&nbsp;
+                                                    <span>需完成：<span th:text="${#dates.format(templateRule.completeDate, 'MM月dd日')}"></span></span>
+                                                </div>
+                                            </div>
+                                            <div th:if="${orgTemplate.templateRuleList}!=null and ${orgTemplate.templateRuleList.size()}&gt;2" class="tmp-link" onclick="loadRuleMore(this)">
+                                                更多
+                                            </div>
+                                            <div class="tmp-rule-tip hide">
+                                                <div class="glyphicon glyphicon-remove text-right tmp-rule-tip-close" onclick="closeRuleMore(this)"></div>
+                                                <div class="tmp-rule-tip-content">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-file-row">
+                                        <div class="tmp-border-right">
+                                            <div>
+                                                所需材料：
+                                                <span class="fa fa-paperclip"></span>
+                                                <span>共
+                                                    <span th:text="${orgTemplate.templateAttachmentList}==null?0:${orgTemplate.templateAttachmentList.size()}"></span>个文件
+                                                </span>
+                                            </div>
+                                            <div class="file-scroll">
+                                                <div th:each="templateAttachment,templateAttachmentStat:${orgTemplate.templateAttachmentList}" class="file-scroll-content" th:text="${templateAttachment.name}" data-toggle="tooltip" th:title="${templateAttachment.name}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-user-row">
+                                        <div class="tmp-border-right">
+                                            <div>创建/修改人：</div>
+                                            <div th:text="${orgTemplate.userName}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <shiro:hasPermission name="template:edit">
+                                    <div class="tmp-operation">
+                                        <input type="hidden" name="hidTemplateId" th:value="${orgTemplate.id}" />
+                                        <input type="hidden" name="hidTemplateName" th:value="${orgTemplate.name}" />
+                                        <input type="hidden" name="hidLinkCount" th:value="null==${orgTemplate.linkCompCount}?0:${orgTemplate.linkCompCount}" />
+                                        <div th:onclick="'editMattertemplate('+this+')'">编辑事项</div>
+                                        <br/>
+                                        <br/>
+                                        <div th:onclick="'linkCompMattertemplate('+this+')'">关联关系</div>
+                                        <br/>
+                                        <br/>
+                                        <div style="color:red;" th:onclick="'removeMattertemplate('+this+')'">删除</div>
+
+                                    </div>
+                                    </shiro:hasPermission>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5">
+                                    <div class="row tmp-title">
+                                        <span id="spanBondTemp" class="glyphicon glyphicon-triangle-bottom cursor-pointer">&nbsp;项目模板事项</span>
+                                        <span class="tmp-title-num" th:text="'('+${proTemplateList.size()}+')'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tr-hover tr-bond" th:each="proTemplate,proTemplateStat:${proTemplateList}">
+                                <td>
+                                    <div class="tmp-row tmp-name-row">
+                                        <div class="tmp-border-right">
+                                            <div class="tmp-icon" th:text="${proTemplate.shortname}" data-toggle="tooltip" th:title="${proTemplate.shortname}" th:style="'background-color:'+${proTemplate.color}+';border-color:'+${proTemplate.color}"></div>
+                                            <div class="tmp-content">
+                                                <div class="content-name" th:text="${proTemplate.name}" data-toggle="tooltip" th:title="${proTemplate.name}"></div>
+                                                <div class="content-text" th:text="${proTemplate.description}" data-toggle="tooltip" th:title="${proTemplate.description}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-rule-row">
+                                        <div class="tmp-border-right">
+                                            <div>提醒规则：</div>
+                                            <div class="tmp-rule"  th:if="${proTemplate.templateRuleList[0].type}==0">
+                                                <div th:each="templateRule,templateRuleStat:${proTemplate.templateRuleList}" th:class="${templateRuleStat.index}&gt;1?'hide'">
+                                                    <span>提醒：<span th:text="${#dates.format(templateRule.remindDate, 'MM月dd日')}"></span></span>&nbsp;&nbsp;
+                                                    <span>需完成：<span th:text="${#dates.format(templateRule.completeDate, 'MM月dd日')}"></span></span>
+                                                </div>
+                                            </div>
+                                            <div class="tmp-rule"  th:if="${proTemplate.templateRuleList[0].type}==1">
+                                                <div th:each="templateRule,templateRuleStat:${proTemplate.templateRuleList}">
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        提醒：
+                                                        <span th:text="'付息日 提前' + ${templateRule.beforeDay} + '工作日'"></span>
+                                                    </span><br/>
+                                                    <span th:if="${templateRuleStat.index}&lt;2">
+                                                        需完成：
+                                                        <span th:text="'付息日 提前' + ${templateRule.completeBeforeDay} + '工作日'"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div th:if="${proTemplate.templateRuleList}!=null and ${proTemplate.templateRuleList.size()}&gt;2" class="tmp-link" onclick="loadRuleMore(this)">
+                                                更多
+                                            </div>
+                                            <div class="tmp-rule-tip hide">
+                                                <div class="glyphicon glyphicon-remove text-right tmp-rule-tip-close" onclick="closeRuleMore(this)"></div>
+                                                <div class="tmp-rule-tip-content">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-file-row">
+                                        <div class="tmp-border-right">
+                                            <div>
+                                                所需材料：
+                                                <span class="fa fa-paperclip"></span>
+                                                <span>共
+                                                    <span th:text="${proTemplate.templateAttachmentList}==null?0:${proTemplate.templateAttachmentList.size()}"></span>个文件
+                                                </span>
+                                            </div>
+                                            <div class="file-scroll">
+                                                <div th:each="templateAttachment,templateAttachmentStat:${proTemplate.templateAttachmentList}" class="file-scroll-content" th:text="${templateAttachment.name}" data-toggle="tooltip" th:title="${templateAttachment.name}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tmp-row tmp-user-row">
+                                        <div class="tmp-border-right">
+                                            <div>创建/修改人：</div>
+                                            <div th:text="${proTemplate.userName}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <shiro:hasPermission name="template:edit">
+                                    <div class="tmp-operation">
+                                        <input type="hidden" name="hidTemplateId" th:value="${proTemplate.id}" />
+                                        <input type="hidden" name="hidTemplateName" th:value="${proTemplate.name}" />
+                                        <input type="hidden" name="hidLinkCount" th:value="null==${proTemplate.linkBondCount}?0:${proTemplate.linkBondCount}" />
+                                        <div th:onclick="'editMattertemplate('+this+')'">编辑事项</div>
+                                        <br/>
+                                        <br/>
+                                        <div th:onclick="'linkBondMattertemplate('+this+')'">关联关系</div>
+                                        <br/>
+                                        <br/>
+                                        <div style="color:red;" th:onclick="'removeMattertemplate('+this+')'">删除</div>
+
+                                    </div>
+                                    </shiro:hasPermission>
+                                </td>
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

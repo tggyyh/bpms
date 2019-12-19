@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.innodealing.bpms.mapper.ProcessHistoryMapper">
+    <insert id="insert">
+        INSERT INTO bpms_process_history (user_id, `type`,task_type, process_id, process_info,mark)
+        VALUES (#{userId},#{type}, #{taskType}, #{processId}, #{processInfo},#{mark})
+    </insert>
+    <select id="findByProcessId" resultType="ProcessHistory">
+       SELECT *,b.name FROM bpms_process_history a LEFT JOIN sys_user b
+          ON a.user_id=b.id
+        WHERE process_id=#{pId} ORDER BY a.create_time ASC
+    </select>
+</mapper>
