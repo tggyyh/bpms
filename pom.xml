@@ -25,7 +25,7 @@
 		<mybatis.version>3.3.1</mybatis.version>
 		<mybatis.spring.version>1.2.4</mybatis.spring.version>
 		<repository.id>nexus</repository.id>
-		<shiro.version>1.2.4</shiro.version>
+		<shiro.version>1.7.1</shiro.version>
 		<repository.name>Team Nexus Repository</repository.name>
 		<repository.url>http://192.168.8.221:8081/nexus/content/repositories/thirdparty</repository.url>
 	</properties>
